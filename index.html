@@ -6,70 +6,302 @@
   <title>材料訂購單</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    /* 這裡貼上原本的 CSS，為了版面整潔我先省略，直接用您原本的即可 */
-    body { font-family: sans-serif; background: #eef1f5; padding: 20px; text-align: center; }
-    button { background: #06c755; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 30px; width: 100%; margin-top: 20px; cursor: pointer; }
-    #status { margin-bottom: 20px; color: #555; }
-    #form-area { display: none; text-align: left; }
-    input { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    /* --- 全域設定 --- */
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif; 
+      background-color: #eef1f5; 
+      margin: 0; padding: 0; 
+      padding-bottom: 120px; /* 預留底部按鈕空間 */
+    }
+
+    /* --- 1. 門神畫面 (登入檢查用) --- */
+    #gatekeeper {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: #eef1f5; z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 20px; text-align: center;
+    }
+    .gate-msg { font-size: 20px; color: #333; margin-bottom: 30px; font-weight: bold; }
+    .gate-btn {
+      background: #06c755; color: white; border: none; padding: 18px 50px;
+      font-size: 22px; border-radius: 50px; font-weight: bold; cursor: pointer;
+      box-shadow: 0 4px 15px rgba(6, 199, 85, 0.4);
+      display: none; /* 預設隱藏，檢查到沒登入才顯示 */
+    }
+    .gate-btn:active { transform: scale(0.95); }
+
+    /* --- 2. 主應用程式 (表單) --- */
+    #app-container { display: none; } /* 驗證通過才顯示 */
+
+    /* 頂部標題 */
+    .header {
+      background: white; padding: 15px 15px; border-bottom: 1px solid #ccc;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header h2 { margin: 0; font-size: 24px; color: #000; font-weight: 800; }
+    .item-count { background: #06c755; color: white; padding: 5px 12px; border-radius: 20px; font-size: 18px; font-weight: bold; }
+
+    /* 列表區 */
+    #order-list { padding: 10px; }
+
+    /* 卡片樣式 */
+    .order-card {
+      background: white; border-radius: 12px; padding: 15px;
+      margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+      position: relative; border: 1px solid #ddd;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #eee;
+    }
+    .card-title { font-weight: 900; color: #333; font-size: 24px; }
+    
+    .delete-btn {
+      color: white; background-color: #ff3b30; border: none;
+      font-size: 16px; padding: 8px 16px; border-radius: 8px;
+    }
+
+    /* 輸入區塊 (長輩友善大尺寸) */
+    .input-group { margin-bottom: 15px; }
+    .input-row { display: flex; gap: 10px; }
+    
+    label { 
+      display: block; font-size: 20px; color: #333; 
+      margin-bottom: 5px; font-weight: 700; 
+    }
+    
+    input {
+      width: 100%; height: 70px; /* 超大點擊區 */
+      padding: 5px 15px;
+      border: 2px solid #ccc; border-radius: 10px;
+      font-size: 26px; /* 超大字體 */
+      background: #f9f9f9; color: #000; font-weight: 500;
+    }
+    input:focus { 
+      border-color: #06c755; background: white; outline: none;
+      box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.2); 
+    }
+    input::placeholder { color: #bbb; font-size: 22px; }
+
+    /* 底部按鈕區 */
+    .footer-actions {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; padding: 15px; border-top: 1px solid #ccc;
+      display: flex; gap: 10px; z-index: 200;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    }
+    .btn {
+      flex: 1; padding: 15px 0; border: none; border-radius: 10px;
+      font-size: 22px; font-weight: 800; cursor: pointer;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .btn-add { background: #e8f5e9; color: #06c755; flex: 0.4; border: 2px solid #06c755; }
+    .btn-send { background: #06c755; color: white; flex: 1; }
+    .btn:active { opacity: 0.8; }
   </style>
 </head>
 <body>
 
-  <div id="loading-area">
-    <h2 id="status">準備中...</h2>
-    <button id="login-btn" style="display:none" onclick="doLogin()">登入 / 授權</button>
+  <div id="gatekeeper">
+    <div class="gate-msg" id="gate-msg">系統連線中...</div>
+    <button class="gate-btn" id="login-btn" onclick="startLogin()">LINE 登入 / 授權</button>
   </div>
 
-  <div id="form-area">
-    <h2>填寫訂單</h2>
-    <input type="text" id="order-info" placeholder="輸入內容...">
-    <button onclick="sendOrder()">送出</button>
+  <div id="app-container">
+    <div class="header">
+      <h2>📝 訂購單</h2>
+      <span class="item-count" id="total-count">1</span>
+    </div>
+
+    <div id="order-list">
+      </div>
+
+    <div class="footer-actions">
+      <button class="btn btn-add" onclick="addItem()">＋ 新增</button>
+      <button class="btn btn-send" onclick="sendOrder()">確認送出</button>
+    </div>
   </div>
 
   <script>
-    // ⚠️ 這裡之後要換成新的 LIFF ID
-    const YOUR_LIFF_ID = '2008839956-KquncO8W';
+    // 您的 GitHub Pages LIFF ID
+    const YOUR_LIFF_ID = '2008839956-KquncO8W'; 
 
+    // --- LIFF 初始化與登入檢查 ---
     window.onload = function() {
-      // GitHub Pages 不會轉址，所以這裡一定會成功
+      // 顯示檢查中
+      document.getElementById('gate-msg').innerText = "系統檢查中...";
+
       liff.init({ liffId: YOUR_LIFF_ID })
         .then(() => {
-          if (!liff.isLoggedIn()) {
-            document.getElementById('status').innerText = "請先登入";
-            document.getElementById('login-btn').style.display = 'block';
-          } else {
-            checkScope();
-          }
+          checkLoginStatus();
         })
         .catch((err) => {
-          document.getElementById('status').innerText = "錯誤: " + err;
+          // 初始化失敗 (可能是 ID 錯或網路問題)
+          document.getElementById('gate-msg').innerText = "系統連線失敗";
+          console.error(err);
         });
     };
 
-    function doLogin() {
-      // 這裡不需要 redirectUri，因為 GitHub 不會亂跳轉
-      liff.login({ scope: "profile chat_message.write" });
+    function checkLoginStatus() {
+      // 1. 檢查是否登入
+      if (!liff.isLoggedIn()) {
+        showGateButton("請先登入 LINE");
+        return;
+      }
+
+      // 2. 檢查權限 (確保能發送訊息)
+      const context = liff.getContext();
+      const scopes = (context && context.scope) ? context.scope : [];
+      if (!scopes.includes("chat_message.write")) {
+        showGateButton("缺少發送權限，請點擊修復");
+        return;
+      }
+
+      // 3. 一切正常，進入表單
+      enterApp();
     }
 
-    function checkScope() {
-      const context = liff.getContext();
-      if (!context.scope.includes("chat_message.write")) {
-        alert("權限不足，請重新登入");
-        doLogin();
-      } else {
-        // 顯示表單
-        document.getElementById('loading-area').style.display = 'none';
-        document.getElementById('form-area').style.display = 'block';
+    function showGateButton(msg) {
+      document.getElementById('gate-msg').innerText = msg;
+      document.getElementById('login-btn').style.display = 'block';
+    }
+
+    // 按鈕點擊事件：強制登入並要求授權
+    function startLogin() {
+      liff.login({ scope: "profile chat_message.write", prompt: "consent" });
+    }
+
+    // 進入主程式
+    function enterApp() {
+      document.getElementById('gatekeeper').style.display = 'none';
+      document.getElementById('app-container').style.display = 'block';
+      addItem(); // 預設新增一筆
+    }
+
+    // --- 以下是原本的表單邏輯 ---
+
+    function addItem() {
+      const container = document.getElementById('order-list');
+      const count = container.children.length + 1;
+      
+      const div = document.createElement('div');
+      div.className = 'order-card';
+      div.innerHTML = `
+        <div class="card-header">
+          <span class="card-title">項目 #${count}</span>
+          ${count > 1 ? '<button class="delete-btn" onclick="removeItem(this)">刪除</button>' : ''}
+        </div>
+        
+        <div class="input-group">
+          <label>型號</label>
+          <input type="text" class="input-model" placeholder="填寫型號">
+        </div>
+
+        <div class="input-row">
+          <div style="flex: 1;">
+            <label>尺寸</label>
+            <input type="text" class="input-size" placeholder="填寫">
+          </div>
+          <div style="flex: 1;">
+            <label>數量</label>
+            <input type="number" class="input-qty" inputmode="numeric" placeholder="填寫">
+          </div>
+        </div>
+        
+        <div class="input-group" style="margin-top: 15px;">
+          <label>顏色</label>
+          <input type="text" class="input-color" placeholder="填寫顏色 (選填)">
+        </div>
+      `;
+      container.appendChild(div);
+      updateCount();
+      
+      // 平滑捲動
+      setTimeout(() => {
+          div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+
+    function removeItem(btn) {
+      if(confirm('確定要刪除這個項目嗎？')) {
+        const card = btn.closest('.order-card');
+        card.remove();
+        // 重新編號
+        const cards = document.querySelectorAll('.order-card');
+        cards.forEach((card, index) => {
+          card.querySelector('.card-title').innerText = `項目 #${index + 1}`;
+          const delBtn = card.querySelector('.delete-btn');
+          if(index === 0 && delBtn) delBtn.remove();
+        });
+        updateCount();
       }
     }
 
+    function updateCount() {
+      const count = document.querySelectorAll('.order-card').length;
+      document.getElementById('total-count').innerText = `${count} 筆`;
+    }
+
     function sendOrder() {
-      // 這裡放原本的 sendMessages 邏輯
-      const text = document.getElementById('order-info').value;
-      liff.sendMessages([{ type: 'text', text: text }])
-        .then(() => liff.closeWindow())
-        .catch(err => alert("發送失敗:" + err));
+      const cards = document.querySelectorAll('.order-card');
+      let messageLines = [];
+      let hasError = false;
+      let firstErrorInput = null;
+
+      cards.forEach((card, index) => {
+        const modelInput = card.querySelector('.input-model');
+        const qtyInput = card.querySelector('.input-qty');
+        const model = modelInput.value.trim();
+        const size = card.querySelector('.input-size').value.trim();
+        const qty = qtyInput.value.trim();
+        const color = card.querySelector('.input-color').value.trim();
+
+        // 重置紅框
+        modelInput.style.borderColor = '#ccc';
+        qtyInput.style.borderColor = '#ccc';
+        modelInput.style.background = '#f9f9f9';
+        qtyInput.style.background = '#f9f9f9';
+
+        if (!model || !qty) {
+          hasError = true;
+          if(!model) {
+              modelInput.style.borderColor = 'red';
+              modelInput.style.background = '#ffe6e6';
+              if(!firstErrorInput) firstErrorInput = modelInput;
+          }
+          if(!qty) {
+              qtyInput.style.borderColor = 'red';
+              qtyInput.style.background = '#ffe6e6';
+              if(!firstErrorInput) firstErrorInput = qtyInput;
+          }
+        } else {
+          const line = `${model}, ${size || ' '}, ${qty}, ${color || ' '}`;
+          messageLines.push(line);
+        }
+      });
+
+      if (hasError) {
+        if(firstErrorInput) firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('請填寫紅色的必填欄位！');
+        return;
+      }
+
+      if (messageLines.length === 0) return;
+
+      const finalMessage = messageLines.join('\n');
+
+      if (liff.isInClient()) {
+        liff.sendMessages([{ type: 'text', text: finalMessage }])
+          .then(() => { liff.closeWindow(); })
+          .catch((err) => { 
+             alert('發送失敗：' + err);
+          });
+      } else {
+        alert("測試模式內容：\n" + finalMessage);
+      }
     }
   </script>
 </body>

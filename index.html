@@ -57,7 +57,7 @@
   <div id="view-form" class="view-section">
     <div class="header">
       <h2 id="form-title">📝 新增訂單</h2>
-      <button class="btn-home" onclick="location.href='?page=history'">查看紀錄</button>
+      <button class="btn-home" onclick="showHistoryView()">查看紀錄</button>
     </div>
     <div id="order-list"></div> <div class="footer-actions">
       <button class="btn btn-add" onclick="addItem()">＋</button>
@@ -68,7 +68,7 @@
   <div id="view-history" class="view-section">
     <div class="header">
       <h2>📋 未出貨訂單</h2>
-      <button class="btn-home" onclick="location.href='?'">我要下單</button>
+      <button class="btn-home" onclick="showFormView()">我要下單</button>
     </div>
     <div style="padding: 15px;">
       <div id="history-container">載入中...</div>
@@ -95,7 +95,7 @@
       }).catch(err => alert("初始化失敗: " + err));
     };
 
-    // 路由檢查
+    // 路由檢查 (初次載入時用)
     function checkRoute() {
       const params = new URLSearchParams(window.location.search);
       const page = params.get('page');
@@ -109,11 +109,18 @@
       }
     }
 
-    // --- 視圖切換 ---
+    // --- 視圖切換 (無刷新切換) ---
     function showFormView() {
       document.getElementById('view-form').classList.add('active-view');
       document.getElementById('view-history').classList.remove('active-view');
+      // 如果列表是空的，預設加一筆
       if(document.getElementById('order-list').innerHTML === '') addItem();
+      // 切換標題
+      if(currentOrderId) {
+        document.getElementById('form-title').innerText = "✏️ 修改訂單";
+      } else {
+        document.getElementById('form-title').innerText = "📝 新增訂單";
+      }
     }
 
     function showHistoryView() {
@@ -144,7 +151,13 @@
 
     // --- 功能 1: 取得歷史訂單 ---
     function fetchHistory() {
-      const userId = liff.getDecodedIDToken().sub;
+      const context = liff.getContext();
+      if (!context || !context.userId) {
+         // 如果抓不到 ID，安靜地重試或忽略
+         return; 
+      }
+      const userId = context.userId;
+
       document.getElementById('history-container').innerHTML = '載入中...';
 
       callApi({ action: 'getOrders', userId: userId }, (resp) => {
@@ -152,7 +165,7 @@
         container.innerHTML = '';
 
         if (!resp.orders || resp.orders.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color:#999;">目前沒有待處理的訂單</p>';
+          container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;">目前沒有待處理的訂單</p>';
           return;
         }
 
@@ -188,9 +201,7 @@
       const content = decodeURIComponent(contentEncoded);
       
       // 切換回表單頁面
-      document.getElementById('view-history').classList.remove('active-view');
-      document.getElementById('view-form').classList.add('active-view');
-      document.getElementById('form-title').innerText = "✏️ 修改訂單";
+      showFormView();
       
       // 清空表單並解析內容填入
       const container = document.getElementById('order-list');
@@ -219,28 +230,25 @@
     }
 
     // --- 功能 4: 送出 (新增或修改) ---
-    // --- 功能 4: 送出 (新增或修改) ---
     function submitOrder() {
       const cards = document.querySelectorAll('.card-item'); 
       let lines = [];
       
       // 1. 抓取表單資料
       cards.forEach(card => {
-        const m = card.querySelector('.in-model').value.trim(); // 加上 trim() 去除空白
+        const m = card.querySelector('.in-model').value.trim();
         const s = card.querySelector('.in-size').value.trim();
         const q = card.querySelector('.in-qty').value.trim();
         const c = card.querySelector('.in-color').value.trim();
-        // 必填檢查：型號(m) 和 數量(q) 都要有
+        
         if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`);
       });
 
-      // 2. 如果沒填資料，跳出警示並停止
       if(lines.length === 0) return alert("請填寫「型號」與「數量」！");
 
       const action = currentOrderId ? 'update' : 'create';
       
-      // ⚠️ 修正點：改用 getContext().userId 來取得 ID
-      // 這樣才不會因為沒有 openid 權限而報錯
+      // 取得 ID
       const context = liff.getContext();
       if (!context || !context.userId) {
         alert("無法取得使用者 ID，請重新登入");
@@ -258,14 +266,18 @@
       }, (resp) => {
         if(resp.result === 'success') {
           alert(action === 'create' ? "訂單已送出！" : "修改成功！");
-          location.href = '?page=history'; 
+          
+          // 修正點 3：成功後直接切換視圖，不重新導向
+          currentOrderId = null; // 重置狀態
+          showHistoryView(); 
+          
         } else {
           alert("失敗: " + resp.msg);
         }
       });
     }
 
-    // --- 輔助: 動態新增卡片 (支援預填值) ---
+    // --- 輔助: 動態新增卡片 ---
     function addItem(m='', s='', q='', c='') {
       const container = document.getElementById('order-list');
       const count = container.children.length + 1;

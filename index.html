@@ -219,23 +219,37 @@
     }
 
     // --- 功能 4: 送出 (新增或修改) ---
+    // --- 功能 4: 送出 (新增或修改) ---
     function submitOrder() {
-      const cards = document.querySelectorAll('.card-item'); // 注意 class
+      const cards = document.querySelectorAll('.card-item'); 
       let lines = [];
       
+      // 1. 抓取表單資料
       cards.forEach(card => {
-        const m = card.querySelector('.in-model').value;
-        const s = card.querySelector('.in-size').value;
-        const q = card.querySelector('.in-qty').value;
-        const c = card.querySelector('.in-color').value;
+        const m = card.querySelector('.in-model').value.trim(); // 加上 trim() 去除空白
+        const s = card.querySelector('.in-size').value.trim();
+        const q = card.querySelector('.in-qty').value.trim();
+        const c = card.querySelector('.in-color').value.trim();
+        // 必填檢查：型號(m) 和 數量(q) 都要有
         if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`);
       });
 
-      if(lines.length === 0) return alert("請填寫內容");
+      // 2. 如果沒填資料，跳出警示並停止
+      if(lines.length === 0) return alert("請填寫「型號」與「數量」！");
 
       const action = currentOrderId ? 'update' : 'create';
-      const userId = liff.getDecodedIDToken().sub;
+      
+      // ⚠️ 修正點：改用 getContext().userId 來取得 ID
+      // 這樣才不會因為沒有 openid 權限而報錯
+      const context = liff.getContext();
+      if (!context || !context.userId) {
+        alert("無法取得使用者 ID，請重新登入");
+        location.reload();
+        return;
+      }
+      const userId = context.userId;
 
+      // 3. 呼叫 GAS API
       callApi({
         action: action,
         orderId: currentOrderId,
@@ -244,7 +258,6 @@
       }, (resp) => {
         if(resp.result === 'success') {
           alert(action === 'create' ? "訂單已送出！" : "修改成功！");
-          // 送出後跳轉到歷史頁面，方便查看倒數
           location.href = '?page=history'; 
         } else {
           alert("失敗: " + resp.msg);

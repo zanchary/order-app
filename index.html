@@ -6,7 +6,7 @@
   <title>訂購系統</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    /* --- CSS 樣式區 --- */
+    /* --- CSS 樣式區 (與您原本相同，為節省篇幅省略部分重複樣式) --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", Roboto, sans-serif; background-color: #eef1f5; margin: 0; padding: 0; padding-bottom: 100px; }
     
@@ -181,29 +181,22 @@
       });
     }
 
-    // --- 刪除並發送訊息 ---
+    // --- 刪除功能 (已移除 liff.sendMessages) ---
     function deleteOrder(orderId) {
       if(!confirm("確定要刪除這筆訂單嗎？")) return;
       
       callApi({ action: 'delete', orderId: orderId }, (resp) => {
         if(resp.result === 'success') {
-          // 成功後發送訊息到聊天室
-          liff.sendMessages([{ type: 'text', text: "❌ 訂單已取消\n單號：" + orderId }])
-            .then(() => {
-                alert("刪除成功");
-                fetchHistory(); // 重新整理列表
-            })
-            .catch((err) => {
-                // 如果被封鎖或權限不足，還是要讓流程繼續
-                alert("刪除成功 (訊息發送失敗)");
-                fetchHistory();
-            });
+          // 成功後只需顯示提示，訊息會由機器人發送
+          alert("刪除成功！");
+          fetchHistory(); // 重新整理列表
         } else {
           alert("失敗: " + resp.msg);
         }
       });
     }
 
+    // --- 送出訂單 (已移除 liff.sendMessages) ---
     function submitOrder() {
       const cards = document.querySelectorAll('.card-item'); 
       let lines = [];
@@ -235,21 +228,10 @@
         content: lines.join('\n')
       }, (resp) => {
         if(resp.result === 'success') {
-          // 送出成功後發送訊息
-          let msgText = action === 'create' ? "✅ 新訂單已送出" : "✅ 訂單已修改";
-          // 可以在訊息中包含內容，這裡簡單發送狀態
-          liff.sendMessages([{ type: 'text', text: msgText + "\n" + lines.join('\n') }])
-            .then(() => {
-               alert(action === 'create' ? "訂單已送出！" : "修改成功！");
-               currentOrderId = null; 
-               showHistoryView(); 
-            })
-            .catch(() => {
-               alert((action === 'create' ? "訂單已送出！" : "修改成功！") + " (訊息發送失敗)");
-               currentOrderId = null; 
-               showHistoryView(); 
-            });
-          
+          // 成功後跳轉，訊息由機器人發送
+          alert(action === 'create' ? "訂單已送出！" : "修改成功！");
+          currentOrderId = null; 
+          showHistoryView(); 
         } else {
           alert("失敗: " + resp.msg);
         }

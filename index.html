@@ -10,29 +10,24 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", Roboto, sans-serif; background-color: #eef1f5; margin: 0; padding: 0; padding-bottom: 100px; }
     
-    /* 頁面切換控制 */
-    .view-section { display: none; } /* 預設全部隱藏 */
+    .view-section { display: none; } 
     .active-view { display: block; }
 
-    /* Header */
     .header { background: white; padding: 15px; border-bottom: 1px solid #ccc; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .header h2 { margin: 0; font-size: 22px; color: #333; font-weight: 800; }
     .btn-home { background: #6c757d; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 14px;}
 
-    /* 列表樣式 */
     .order-card { background: white; border-radius: 12px; padding: 15px; margin: 15px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; position: relative; }
     .input-group { margin-bottom: 10px; }
     label { display: block; font-size: 18px; color: #555; margin-bottom: 5px; font-weight: bold; }
     input { width: 100%; height: 50px; padding: 5px 10px; border: 2px solid #ccc; border-radius: 8px; font-size: 20px; background: #f9f9f9; }
     input:focus { border-color: #06c755; background: white; outline: none; }
     
-    /* 按鈕 */
     .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; border-top: 1px solid #ccc; display: flex; gap: 10px; z-index: 200; }
     .btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 20px; font-weight: 800; cursor: pointer; color: white; }
     .btn-add { background: #e8f5e9; color: #06c755; border: 2px solid #06c755; flex: 0.4; }
     .btn-send { background: #06c755; }
     
-    /* 歷史訂單列表專用 */
     .history-item { border-left: 5px solid #06c755; padding-left: 10px; margin-bottom: 10px; }
     .history-info { font-size: 14px; color: #666; display: flex; justify-content: space-between; margin-bottom: 5px;}
     .history-content { font-size: 18px; font-weight: bold; color: #333; white-space: pre-wrap; margin-bottom: 10px; }
@@ -42,7 +37,6 @@
     .btn-del { background: #dc3545; }
     .btn-refresh { background: #17a2b8; width: 100%; margin-top: 20px; padding: 10px; color: white; border: none; border-radius: 5px; font-size: 18px;}
 
-    /* 載入遮罩 */
     #loading-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 20px; flex-direction: column; }
     #gate-btn { margin-top: 20px; padding: 10px 30px; background: #06c755; color: white; border: none; border-radius: 20px; font-size: 18px; display: none;}
   </style>
@@ -82,7 +76,7 @@
     // ⚠️ 務必換成您「新部署」的 GAS 網址
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxSxQMULkJwhjldW0eMWUbesEjxy3Kg0rYQpG7RJufIhzQMtvA9ZlenyEbaQBFkgW52mw/exec';
 
-    let currentOrderId = null; // 用來判斷是新增還是修改
+    let currentOrderId = null; 
 
     window.onload = function() {
       liff.init({ liffId: LIFF_ID }).then(() => {
@@ -90,54 +84,36 @@
           document.getElementById('loading-text').innerText = "請先登入";
           document.getElementById('gate-btn').style.display = 'block';
         } else {
-          checkRoute(); // 登入成功後，檢查網址決定去哪一頁
+          checkRoute(); 
         }
       }).catch(err => alert("初始化失敗: " + err));
     };
 
-    // 路由檢查 (初次載入時用)
     function checkRoute() {
       const params = new URLSearchParams(window.location.search);
       const page = params.get('page');
-
       document.getElementById('loading-mask').style.display = 'none';
-
-      if (page === 'history') {
-        showHistoryView();
-      } else {
-        showFormView(); // 預設顯示新增表單
-      }
+      if (page === 'history') showHistoryView(); else showFormView();
     }
 
-    // --- 視圖切換 (無刷新切換) ---
     function showFormView() {
       document.getElementById('view-form').classList.add('active-view');
       document.getElementById('view-history').classList.remove('active-view');
-      // 如果列表是空的，預設加一筆
       if(document.getElementById('order-list').innerHTML === '') addItem();
-      // 切換標題
-      if(currentOrderId) {
-        document.getElementById('form-title').innerText = "✏️ 修改訂單";
-      } else {
-        document.getElementById('form-title').innerText = "📝 新增訂單";
-      }
+      if(currentOrderId) document.getElementById('form-title').innerText = "✏️ 修改訂單";
+      else document.getElementById('form-title').innerText = "📝 新增訂單";
     }
 
     function showHistoryView() {
       document.getElementById('view-form').classList.remove('active-view');
       document.getElementById('view-history').classList.add('active-view');
-      fetchHistory(); // 載入資料
+      fetchHistory();
     }
 
-    // --- API 呼叫 ---
     function callApi(data, callback) {
       document.getElementById('loading-mask').style.display = 'flex';
       document.getElementById('loading-text').innerText = "處理中...";
-      
-      fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
+      fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) })
       .then(res => res.json())
       .then(json => {
         document.getElementById('loading-mask').style.display = 'none';
@@ -149,13 +125,9 @@
       });
     }
 
-    // --- 功能 1: 取得歷史訂單 ---
     function fetchHistory() {
       const context = liff.getContext();
-      if (!context || !context.userId) {
-         // 如果抓不到 ID，安靜地重試或忽略
-         return; 
-      }
+      if (!context || !context.userId) return; 
       const userId = context.userId;
 
       document.getElementById('history-container').innerHTML = '載入中...';
@@ -173,7 +145,6 @@
           const div = document.createElement('div');
           div.className = 'order-card history-item';
           
-          // 判斷是否可編輯 (3分鐘內)
           let actionHtml = '';
           if (order.remaining > 0) {
             actionHtml = `
@@ -195,18 +166,12 @@
       });
     }
 
-    // --- 功能 2: 載入修改 ---
     function loadEdit(orderId, contentEncoded) {
       currentOrderId = orderId;
       const content = decodeURIComponent(contentEncoded);
-      
-      // 切換回表單頁面
       showFormView();
-      
-      // 清空表單並解析內容填入
       const container = document.getElementById('order-list');
       container.innerHTML = ''; 
-      
       const lines = content.split('\n');
       lines.forEach(line => {
         const parts = line.split(',');
@@ -216,31 +181,38 @@
       });
     }
 
-    // --- 功能 3: 刪除訂單 ---
+    // --- 刪除並發送訊息 ---
     function deleteOrder(orderId) {
       if(!confirm("確定要刪除這筆訂單嗎？")) return;
+      
       callApi({ action: 'delete', orderId: orderId }, (resp) => {
         if(resp.result === 'success') {
-          alert("刪除成功");
-          fetchHistory(); // 重新整理列表
+          // 成功後發送訊息到聊天室
+          liff.sendMessages([{ type: 'text', text: "❌ 訂單已取消\n單號：" + orderId }])
+            .then(() => {
+                alert("刪除成功");
+                fetchHistory(); // 重新整理列表
+            })
+            .catch((err) => {
+                // 如果被封鎖或權限不足，還是要讓流程繼續
+                alert("刪除成功 (訊息發送失敗)");
+                fetchHistory();
+            });
         } else {
           alert("失敗: " + resp.msg);
         }
       });
     }
 
-    // --- 功能 4: 送出 (新增或修改) ---
     function submitOrder() {
       const cards = document.querySelectorAll('.card-item'); 
       let lines = [];
       
-      // 1. 抓取表單資料
       cards.forEach(card => {
         const m = card.querySelector('.in-model').value.trim();
         const s = card.querySelector('.in-size').value.trim();
         const q = card.querySelector('.in-qty').value.trim();
         const c = card.querySelector('.in-color').value.trim();
-        
         if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`);
       });
 
@@ -248,7 +220,6 @@
 
       const action = currentOrderId ? 'update' : 'create';
       
-      // 取得 ID
       const context = liff.getContext();
       if (!context || !context.userId) {
         alert("無法取得使用者 ID，請重新登入");
@@ -257,7 +228,6 @@
       }
       const userId = context.userId;
 
-      // 3. 呼叫 GAS API
       callApi({
         action: action,
         orderId: currentOrderId,
@@ -265,11 +235,20 @@
         content: lines.join('\n')
       }, (resp) => {
         if(resp.result === 'success') {
-          alert(action === 'create' ? "訂單已送出！" : "修改成功！");
-          
-          // 修正點 3：成功後直接切換視圖，不重新導向
-          currentOrderId = null; // 重置狀態
-          showHistoryView(); 
+          // 送出成功後發送訊息
+          let msgText = action === 'create' ? "✅ 新訂單已送出" : "✅ 訂單已修改";
+          // 可以在訊息中包含內容，這裡簡單發送狀態
+          liff.sendMessages([{ type: 'text', text: msgText + "\n" + lines.join('\n') }])
+            .then(() => {
+               alert(action === 'create' ? "訂單已送出！" : "修改成功！");
+               currentOrderId = null; 
+               showHistoryView(); 
+            })
+            .catch(() => {
+               alert((action === 'create' ? "訂單已送出！" : "修改成功！") + " (訊息發送失敗)");
+               currentOrderId = null; 
+               showHistoryView(); 
+            });
           
         } else {
           alert("失敗: " + resp.msg);
@@ -277,7 +256,6 @@
       });
     }
 
-    // --- 輔助: 動態新增卡片 ---
     function addItem(m='', s='', q='', c='') {
       const container = document.getElementById('order-list');
       const count = container.children.length + 1;

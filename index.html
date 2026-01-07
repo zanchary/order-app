@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>材料訂購單</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    /* 這裡貼上原本的 CSS，為了版面整潔我先省略，直接用您原本的即可 */
+    body { font-family: sans-serif; background: #eef1f5; padding: 20px; text-align: center; }
+    button { background: #06c755; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 30px; width: 100%; margin-top: 20px; cursor: pointer; }
+    #status { margin-bottom: 20px; color: #555; }
+    #form-area { display: none; text-align: left; }
+    input { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-area">
+    <h2 id="status">準備中...</h2>
+    <button id="login-btn" style="display:none" onclick="doLogin()">登入 / 授權</button>
+  </div>
+
+  <div id="form-area">
+    <h2>填寫訂單</h2>
+    <input type="text" id="order-info" placeholder="輸入內容...">
+    <button onclick="sendOrder()">送出</button>
+  </div>
+
+  <script>
+    // ⚠️ 這裡之後要換成新的 LIFF ID
+    const YOUR_LIFF_ID = '2008839956-KquncO8W';
+
+    window.onload = function() {
+      // GitHub Pages 不會轉址，所以這裡一定會成功
+      liff.init({ liffId: YOUR_LIFF_ID })
+        .then(() => {
+          if (!liff.isLoggedIn()) {
+            document.getElementById('status').innerText = "請先登入";
+            document.getElementById('login-btn').style.display = 'block';
+          } else {
+            checkScope();
+          }
+        })
+        .catch((err) => {
+          document.getElementById('status').innerText = "錯誤: " + err;
+        });
+    };
+
+    function doLogin() {
+      // 這裡不需要 redirectUri，因為 GitHub 不會亂跳轉
+      liff.login({ scope: "profile chat_message.write" });
+    }
+
+    function checkScope() {
+      const context = liff.getContext();
+      if (!context.scope.includes("chat_message.write")) {
+        alert("權限不足，請重新登入");
+        doLogin();
+      } else {
+        // 顯示表單
+        document.getElementById('loading-area').style.display = 'none';
+        document.getElementById('form-area').style.display = 'block';
+      }
+    }
+
+    function sendOrder() {
+      // 這裡放原本的 sendMessages 邏輯
+      const text = document.getElementById('order-info').value;
+      liff.sendMessages([{ type: 'text', text: text }])
+        .then(() => liff.closeWindow())
+        .catch(err => alert("發送失敗:" + err));
+    }
+  </script>
+</body>
+</html>

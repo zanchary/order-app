@@ -5,103 +5,935 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>訂購系統</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    /* --- CSS 樣式區 (與您原本相同，為節省篇幅省略部分重複樣式) --- */
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", Roboto, sans-serif; background-color: #eef1f5; margin: 0; padding: 0; padding-bottom: 100px; }
-    
-    .view-section { display: none; } 
-    .active-view { display: block; }
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: #1a1a24;
+      --bg-card-hover: #22222e;
+      --accent: #00d4aa;
+      --accent-glow: rgba(0, 212, 170, 0.3);
+      --accent-secondary: #00b894;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --text-muted: #606070;
+      --border: #2a2a3a;
+      --danger: #ff4757;
+      --warning: #ffa502;
+      --success: #00d4aa;
+      --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+      --gradient-card: linear-gradient(145deg, #1a1a24 0%, #15151f 100%);
+      --shadow-glow: 0 0 30px rgba(0, 212, 170, 0.15);
+      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
 
-    .header { background: white; padding: 15px; border-bottom: 1px solid #ccc; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .header h2 { margin: 0; font-size: 22px; color: #333; font-weight: 800; }
-    .btn-home { background: #6c757d; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 14px;}
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
 
-    .order-card { background: white; border-radius: 12px; padding: 15px; margin: 15px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; position: relative; }
-    .input-group { margin-bottom: 10px; }
-    label { display: block; font-size: 18px; color: #555; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; height: 50px; padding: 5px 10px; border: 2px solid #ccc; border-radius: 8px; font-size: 20px; background: #f9f9f9; }
-    input:focus { border-color: #06c755; background: white; outline: none; }
-    
-    .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; border-top: 1px solid #ccc; display: flex; gap: 10px; z-index: 200; }
-    .btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 20px; font-weight: 800; cursor: pointer; color: white; }
-    .btn-add { background: #e8f5e9; color: #06c755; border: 2px solid #06c755; flex: 0.4; }
-    .btn-send { background: #06c755; }
-    
-    .history-item { border-left: 5px solid #06c755; padding-left: 10px; margin-bottom: 10px; }
-    .history-info { font-size: 14px; color: #666; display: flex; justify-content: space-between; margin-bottom: 5px;}
-    .history-content { font-size: 18px; font-weight: bold; color: #333; white-space: pre-wrap; margin-bottom: 10px; }
-    .history-actions { display: flex; gap: 10px; }
-    .btn-small { flex: 1; padding: 8px; border: none; border-radius: 5px; color: white; cursor: pointer; font-size: 16px; }
-    .btn-edit { background: #ffc107; color: #000; }
-    .btn-del { background: #dc3545; }
-    .btn-refresh { background: #17a2b8; width: 100%; margin-top: 20px; padding: 10px; color: white; border: none; border-radius: 5px; font-size: 18px;}
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
 
-    #loading-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 20px; flex-direction: column; }
-    #gate-btn { margin-top: 20px; padding: 10px 30px; background: #06c755; color: white; border: none; border-radius: 20px; font-size: 18px; display: none;}
+    /* 背景裝飾 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 184, 148, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .view-section { 
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+    .active-view { 
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(0, 212, 170, 0.4); }
+    }
+
+    /* Header */
+    .header {
+      background: rgba(18, 18, 26, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-accent);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header h2 span {
+      color: var(--accent);
+    }
+
+    .btn-nav {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-nav:active {
+      transform: scale(0.97);
+    }
+
+    /* 內容區域 */
+    .content-area {
+      padding: 20px 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 訂單卡片 */
+    .order-card {
+      background: var(--gradient-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.4s ease backwards;
+    }
+
+    .order-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-number {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-badge {
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .card-label {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .btn-delete-card {
+      background: rgba(255, 71, 87, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-delete-card:hover {
+      background: rgba(255, 71, 87, 0.2);
+    }
+
+    /* 輸入框群組 */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 500;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input::placeholder {
+      color: var(--text-muted);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      background: var(--bg-primary);
+      outline: none;
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+
+    /* 底部操作列 */
+    .footer-actions {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(18, 18, 26, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 16px 20px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      z-index: 200;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-add {
+      background: var(--bg-card);
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      flex: 0 0 60px;
+    }
+
+    .btn-add:hover {
+      background: rgba(0, 212, 170, 0.1);
+    }
+
+    .btn-send {
+      background: var(--gradient-accent);
+      color: var(--bg-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-send::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn-send:hover::before {
+      left: 100%;
+    }
+
+    .btn-send:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* 歷史紀錄卡片 */
+    .history-card {
+      background: var(--gradient-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border);
+      animation: slideUp 0.4s ease backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-card.editable::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-accent);
+    }
+
+    .history-card.expired::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--danger);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .history-time {
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-id {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .history-status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .status-active {
+      background: rgba(0, 212, 170, 0.15);
+      color: var(--accent);
+    }
+
+    .status-expired {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+    }
+
+    .history-content {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .order-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .order-item-label {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .order-item-value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+
+    .btn-edit {
+      background: rgba(255, 165, 2, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 165, 2, 0.3);
+    }
+
+    .btn-edit:hover {
+      background: rgba(255, 165, 2, 0.25);
+    }
+
+    .btn-del {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    .btn-del:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
+
+    .btn-refresh {
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-refresh:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-refresh:active {
+      transform: scale(0.98);
+    }
+
+    /* 空狀態 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .empty-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* 載入遮罩 */
+    #loading-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      position: relative;
+    }
+
+    .loader::before,
+    .loader::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .loader::before {
+      width: 100%;
+      height: 100%;
+      border: 3px solid var(--border);
+    }
+
+    .loader::after {
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #loading-text {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    #gate-btn {
+      margin-top: 12px;
+      padding: 14px 40px;
+      background: var(--gradient-accent);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    #gate-btn:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* 骨架屏 */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    .skeleton-card {
+      background: var(--gradient-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .skeleton-line {
+      height: 16px;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-line.short {
+      width: 60%;
+    }
+
+    .skeleton-line.medium {
+      width: 80%;
+    }
+
+    .skeleton-box {
+      height: 100px;
+      margin-bottom: 12px;
+    }
+
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success {
+      border-color: var(--accent);
+    }
+
+    .toast.error {
+      border-color: var(--danger);
+    }
+
+    /* 倒數計時 */
+    .countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    .countdown-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--warning);
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+
+    /* 確認對話框 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 20px;
+      max-width: 360px;
+      width: 100%;
+      border: 1px solid var(--border);
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .modal-icon.warning {
+      background: rgba(255, 71, 87, 0.15);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .modal-btn-cancel {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .modal-btn-confirm {
+      background: var(--danger);
+      color: white;
+    }
   </style>
 </head>
 <body>
 
+  <!-- 載入遮罩 -->
   <div id="loading-mask">
+    <div class="loader"></div>
     <div id="loading-text">系統連線中...</div>
     <button id="gate-btn" onclick="liff.login({scope:'profile chat_message.write'})">登入 LINE</button>
   </div>
 
-  <div id="view-form" class="view-section">
-    <div class="header">
-      <h2 id="form-title">📝 新增訂單</h2>
-      <button class="btn-home" onclick="showHistoryView()">查看紀錄</button>
-    </div>
-    <div id="order-list"></div> <div class="footer-actions">
-      <button class="btn btn-add" onclick="addItem()">＋</button>
-      <button class="btn btn-send" onclick="submitOrder()">確認送出</button>
+  <!-- Toast 通知 -->
+  <div id="toast" class="toast"></div>
+
+  <!-- 確認對話框 -->
+  <div id="modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-icon warning">⚠️</div>
+      <div class="modal-title" id="modal-title">確認刪除</div>
+      <div class="modal-desc" id="modal-desc">確定要刪除這筆訂單嗎？此操作無法復原。</div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="hideModal()">取消</button>
+        <button class="modal-btn modal-btn-confirm" id="modal-confirm">確認刪除</button>
+      </div>
     </div>
   </div>
 
+  <!-- 新增訂單頁面 -->
+  <div id="view-form" class="view-section">
+    <div class="header">
+      <div class="header-title">
+        <div class="header-icon">📝</div>
+        <h2 id="form-title"><span>新增</span>訂單</h2>
+      </div>
+      <button class="btn-nav" onclick="showHistoryView()">
+        <span>📋</span> 查看紀錄
+      </button>
+    </div>
+    <div class="content-area">
+      <div id="order-list"></div>
+    </div>
+    <div class="footer-actions">
+      <button class="btn btn-add" onclick="addItem()">＋</button>
+      <button class="btn btn-send" id="btn-submit" onclick="submitOrder()">
+        <span>✓</span> 確認送出
+      </button>
+    </div>
+  </div>
+
+  <!-- 歷史紀錄頁面 -->
   <div id="view-history" class="view-section">
     <div class="header">
-      <h2>📋 未出貨訂單</h2>
-      <button class="btn-home" onclick="showFormView()">我要下單</button>
+      <div class="header-title">
+        <div class="header-icon">📋</div>
+        <h2><span>待處理</span>訂單</h2>
+      </div>
+      <button class="btn-nav" onclick="showFormView()">
+        <span>➕</span> 我要下單
+      </button>
     </div>
-    <div style="padding: 15px;">
-      <div id="history-container">載入中...</div>
-      <button class="btn-refresh" onclick="fetchHistory()">🔄 重新整理</button>
+    <div class="content-area">
+      <div id="history-container"></div>
+      <button class="btn-refresh" onclick="fetchHistory()">
+        <span>🔄</span> 重新整理
+      </button>
     </div>
   </div>
 
   <script>
-    // ⚠️ 請填入您的資訊
+    // ⚠️ 設定區
     const LIFF_ID = '2008839956-KquncO8W'; 
-    // ⚠️ 務必換成您「新部署」的 GAS 網址
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxSxQMULkJwhjldW0eMWUbesEjxy3Kg0rYQpG7RJufIhzQMtvA9ZlenyEbaQBFkgW52mw/exec';
 
-    let currentOrderId = null; 
+    let currentOrderId = null;
+    let pendingDeleteId = null;
+    let countdownIntervals = {};
 
+    // ===== 初始化 =====
     window.onload = function() {
       liff.init({ liffId: LIFF_ID }).then(() => {
         if (!liff.isLoggedIn()) {
-          document.getElementById('loading-text').innerText = "請先登入";
+          document.getElementById('loading-text').innerText = "請先登入 LINE";
           document.getElementById('gate-btn').style.display = 'block';
         } else {
-          checkRoute(); 
+          checkRoute();
         }
-      }).catch(err => alert("初始化失敗: " + err));
+      }).catch(err => showToast("初始化失敗: " + err, 'error'));
     };
 
     function checkRoute() {
       const params = new URLSearchParams(window.location.search);
       const page = params.get('page');
       document.getElementById('loading-mask').style.display = 'none';
-      if (page === 'history') showHistoryView(); else showFormView();
+      if (page === 'history') showHistoryView();
+      else showFormView();
     }
 
+    // ===== 頁面切換 =====
     function showFormView() {
       document.getElementById('view-form').classList.add('active-view');
       document.getElementById('view-history').classList.remove('active-view');
       if(document.getElementById('order-list').innerHTML === '') addItem();
-      if(currentOrderId) document.getElementById('form-title').innerText = "✏️ 修改訂單";
-      else document.getElementById('form-title').innerText = "📝 新增訂單";
+      
+      const title = document.getElementById('form-title');
+      if(currentOrderId) {
+        title.innerHTML = '<span>修改</span>訂單';
+      } else {
+        title.innerHTML = '<span>新增</span>訂單';
+      }
     }
 
     function showHistoryView() {
@@ -110,95 +942,255 @@
       fetchHistory();
     }
 
+    // ===== API 呼叫 =====
     function callApi(data, callback) {
-      document.getElementById('loading-mask').style.display = 'flex';
-      document.getElementById('loading-text').innerText = "處理中...";
-      fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) })
+      showLoading("處理中...");
+      
+      fetch(GAS_URL, { 
+        method: 'POST', 
+        body: JSON.stringify(data)
+      })
       .then(res => res.json())
       .then(json => {
-        document.getElementById('loading-mask').style.display = 'none';
+        hideLoading();
         callback(json);
       })
       .catch(err => {
-        document.getElementById('loading-mask').style.display = 'none';
-        alert("連線錯誤: " + err);
+        hideLoading();
+        showToast("連線錯誤: " + err, 'error');
       });
     }
 
+    // ===== 載入狀態 =====
+    function showLoading(text) {
+      const mask = document.getElementById('loading-mask');
+      const loadingText = document.getElementById('loading-text');
+      loadingText.innerText = text || "處理中...";
+      document.getElementById('gate-btn').style.display = 'none';
+      mask.style.display = 'flex';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-mask').style.display = 'none';
+    }
+
+    // ===== Toast 通知 =====
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = type === 'success' ? '✓' : '✕';
+      toast.innerHTML = `<span>${icon}</span> ${message}`;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // ===== Modal 對話框 =====
+    function showModal(title, desc, onConfirm) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = desc;
+      document.getElementById('modal-confirm').onclick = onConfirm;
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function hideModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    // ===== 取得歷史訂單 =====
     function fetchHistory() {
       const context = liff.getContext();
-      if (!context || !context.userId) return; 
+      if (!context || !context.userId) return;
+      
       const userId = context.userId;
+      const container = document.getElementById('history-container');
+      
+      // 顯示骨架屏
+      container.innerHTML = `
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-line short"></div>
+          <div class="skeleton skeleton-box"></div>
+          <div class="skeleton skeleton-line medium"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-line short"></div>
+          <div class="skeleton skeleton-box"></div>
+          <div class="skeleton skeleton-line medium"></div>
+        </div>
+      `;
 
-      document.getElementById('history-container').innerHTML = '載入中...';
+      // 清除所有倒數計時
+      Object.keys(countdownIntervals).forEach(key => {
+        clearInterval(countdownIntervals[key]);
+      });
+      countdownIntervals = {};
 
       callApi({ action: 'getOrders', userId: userId }, (resp) => {
-        const container = document.getElementById('history-container');
         container.innerHTML = '';
 
         if (!resp.orders || resp.orders.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;">目前沒有待處理的訂單</p>';
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📦</div>
+              <div class="empty-title">目前沒有待處理訂單</div>
+              <div class="empty-desc">點擊「我要下單」開始建立新訂單</div>
+            </div>
+          `;
           return;
         }
 
-        resp.orders.forEach(order => {
+        resp.orders.forEach((order, index) => {
           const div = document.createElement('div');
-          div.className = 'order-card history-item';
+          const isEditable = order.remaining > 0;
+          div.className = `history-card ${isEditable ? 'editable' : 'expired'}`;
+          div.style.animationDelay = `${index * 0.1}s`;
           
-          let actionHtml = '';
-          if (order.remaining > 0) {
-            actionHtml = `
+          // 解析訂單內容
+          const items = parseOrderContent(order.content);
+          let itemsHtml = items.map(item => `
+            <div class="order-item">
+              <div>
+                <div class="order-item-label">型號</div>
+                <div class="order-item-value">${escapeHtml(item.model)}</div>
+              </div>
+              <div>
+                <div class="order-item-label">尺寸</div>
+                <div class="order-item-value">${escapeHtml(item.size)}</div>
+              </div>
+              <div>
+                <div class="order-item-label">數量</div>
+                <div class="order-item-value">${escapeHtml(item.qty)}</div>
+              </div>
+              <div>
+                <div class="order-item-label">顏色</div>
+                <div class="order-item-value">${escapeHtml(item.color) || '-'}</div>
+              </div>
+            </div>
+          `).join('');
+
+          let statusHtml = '';
+          let actionsHtml = '';
+          
+          if (isEditable) {
+            statusHtml = `
+              <div class="history-status status-active">
+                <span class="countdown" id="countdown-${order.orderId}">
+                  <span class="countdown-dot"></span>
+                  剩餘 ${formatTime(order.remaining)}
+                </span>
+              </div>
+            `;
+            actionsHtml = `
               <div class="history-actions">
-                <button class="btn-small btn-edit" onclick="loadEdit('${order.orderId}', '${encodeURIComponent(order.content)}')">✏️ 修改 (${order.remaining}s)</button>
-                <button class="btn-small btn-del" onclick="deleteOrder('${order.orderId}')">🗑️ 刪除</button>
-              </div>`;
+                <button class="btn-action btn-edit" onclick="loadEdit('${order.orderId}', '${encodeURIComponent(order.content)}')">
+                  ✏️ 修改
+                </button>
+                <button class="btn-action btn-del" onclick="confirmDelete('${order.orderId}')">
+                  🗑️ 刪除
+                </button>
+              </div>
+            `;
+            
+            // 啟動倒數計時
+            startCountdown(order.orderId, order.remaining);
           } else {
-            actionHtml = `<div style="color:red; font-size:14px; text-align:center; background:#fee; padding:5px; border-radius:5px;">已超過修改時限</div>`;
+            statusHtml = `<div class="history-status status-expired">已逾時</div>`;
+            actionsHtml = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:10px;">已超過修改時限</div>`;
           }
 
           div.innerHTML = `
-            <div class="history-info"><span>📅 ${order.time}</span><span>${order.orderId}</span></div>
-            <div class="history-content">${order.content.replace(/\n/g, '<br>')}</div>
-            ${actionHtml}
+            <div class="history-header">
+              <div class="history-meta">
+                <div class="history-time">📅 ${order.time}</div>
+                <div class="history-id">${order.orderId}</div>
+              </div>
+              ${statusHtml}
+            </div>
+            <div class="history-content">${itemsHtml}</div>
+            ${actionsHtml}
           `;
+          
           container.appendChild(div);
         });
       });
     }
 
+    // ===== 倒數計時 =====
+    function startCountdown(orderId, seconds) {
+      let remaining = seconds;
+      
+      countdownIntervals[orderId] = setInterval(() => {
+        remaining--;
+        const el = document.getElementById(`countdown-${orderId}`);
+        
+        if (remaining <= 0) {
+          clearInterval(countdownIntervals[orderId]);
+          if (el) {
+            el.parentElement.className = 'history-status status-expired';
+            el.parentElement.innerHTML = '已逾時';
+          }
+          return;
+        }
+        
+        if (el) {
+          el.innerHTML = `<span class="countdown-dot"></span> 剩餘 ${formatTime(remaining)}`;
+        }
+      }, 1000);
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // ===== 載入編輯 =====
     function loadEdit(orderId, contentEncoded) {
       currentOrderId = orderId;
       const content = decodeURIComponent(contentEncoded);
       showFormView();
+      
       const container = document.getElementById('order-list');
-      container.innerHTML = ''; 
+      container.innerHTML = '';
+      
       const lines = content.split('\n');
       lines.forEach(line => {
         const parts = line.split(',');
         if(parts.length >= 3) {
-           addItem(parts[0].trim(), parts[1].trim(), parts[2].trim(), parts[3] ? parts[3].trim() : '');
+          addItem(parts[0].trim(), parts[1].trim(), parts[2].trim(), parts[3] ? parts[3].trim() : '');
         }
       });
     }
 
-    // --- 刪除功能 (已移除 liff.sendMessages) ---
-    function deleteOrder(orderId) {
-      if(!confirm("確定要刪除這筆訂單嗎？")) return;
+    // ===== 刪除訂單 =====
+    function confirmDelete(orderId) {
+      pendingDeleteId = orderId;
+      showModal(
+        '確認刪除訂單',
+        '刪除後將無法恢復，確定要刪除這筆訂單嗎？',
+        executeDelete
+      );
+    }
+
+    function executeDelete() {
+      hideModal();
+      if (!pendingDeleteId) return;
       
-      callApi({ action: 'delete', orderId: orderId }, (resp) => {
+      callApi({ action: 'delete', orderId: pendingDeleteId }, (resp) => {
         if(resp.result === 'success') {
-          // 成功後只需顯示提示，訊息會由機器人發送
-          alert("刪除成功！");
-          fetchHistory(); // 重新整理列表
+          showToast("訂單已成功刪除", 'success');
+          fetchHistory();
         } else {
-          alert("失敗: " + resp.msg);
+          showToast("刪除失敗: " + resp.msg, 'error');
         }
+        pendingDeleteId = null;
       });
     }
 
-    // --- 送出訂單 (已移除 liff.sendMessages) ---
+    // ===== 送出訂單 =====
     function submitOrder() {
-      const cards = document.querySelectorAll('.card-item'); 
+      const cards = document.querySelectorAll('.card-item');
       let lines = [];
       
       cards.forEach(card => {
@@ -209,16 +1201,20 @@
         if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`);
       });
 
-      if(lines.length === 0) return alert("請填寫「型號」與「數量」！");
+      if(lines.length === 0) {
+        showToast("請填寫「型號」與「數量」", 'error');
+        return;
+      }
 
       const action = currentOrderId ? 'update' : 'create';
       
       const context = liff.getContext();
       if (!context || !context.userId) {
-        alert("無法取得使用者 ID，請重新登入");
-        location.reload();
+        showToast("無法取得使用者 ID，請重新登入", 'error');
+        setTimeout(() => location.reload(), 2000);
         return;
       }
+
       const userId = context.userId;
 
       callApi({
@@ -228,35 +1224,112 @@
         content: lines.join('\n')
       }, (resp) => {
         if(resp.result === 'success') {
-          // 成功後跳轉，訊息由機器人發送
-          alert(action === 'create' ? "訂單已送出！" : "修改成功！");
-          currentOrderId = null; 
-          showHistoryView(); 
+          showToast(action === 'create' ? "訂單已成功送出！" : "訂單修改成功！", 'success');
+          currentOrderId = null;
+          document.getElementById('order-list').innerHTML = '';
+          addItem();
+          showHistoryView();
         } else {
-          alert("失敗: " + resp.msg);
+          showToast("操作失敗: " + resp.msg, 'error');
         }
       });
     }
 
+    // ===== 新增項目 =====
     function addItem(m='', s='', q='', c='') {
       const container = document.getElementById('order-list');
       const count = container.children.length + 1;
       const div = document.createElement('div');
       div.className = 'order-card card-item';
+      div.style.animationDelay = `${(count - 1) * 0.1}s`;
+      
       div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-          <b style="font-size:18px;">項目 #${count}</b>
-          ${count > 1 ? '<button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;" onclick="this.parentElement.parentElement.remove()">刪除</button>' : ''}
+        <div class="card-header">
+          <div class="card-number">
+            <span class="card-badge">${count}</span>
+            <span class="card-label">商品項目</span>
+          </div>
+          ${count > 1 ? '<button class="btn-delete-card" onclick="removeCard(this)">移除</button>' : ''}
         </div>
-        <div class="input-group"><label>型號</label><input type="text" class="in-model" value="${m}" placeholder="型號"></div>
-        <div style="display:flex; gap:10px;">
-          <div style="flex:1;"><label>尺寸</label><input type="text" class="in-size" value="${s}"></div>
-          <div style="flex:1;"><label>數量</label><input type="number" class="in-qty" value="${q}"></div>
+        <div class="input-group">
+          <label>型號 *</label>
+          <input type="text" class="in-model" value="${escapeHtml(m)}" placeholder="輸入產品型號">
         </div>
-        <div class="input-group" style="margin-top:10px;"><label>顏色</label><input type="text" class="in-color" value="${c}"></div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>尺寸</label>
+            <input type="text" class="in-size" value="${escapeHtml(s)}" placeholder="尺寸">
+          </div>
+          <div class="input-group">
+            <label>數量 *</label>
+            <input type="number" class="in-qty" value="${escapeHtml(q)}" placeholder="數量" min="1">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>顏色</label>
+          <input type="text" class="in-color" value="${escapeHtml(c)}" placeholder="顏色（選填）">
+        </div>
       `;
+      
       container.appendChild(div);
-      setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      
+      setTimeout(() => {
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        div.querySelector('.in-model').focus();
+      }, 100);
+    }
+
+    function removeCard(btn) {
+      const card = btn.closest('.card-item');
+      card.style.animation = 'fadeIn 0.3s ease reverse';
+      setTimeout(() => {
+        card.remove();
+        updateCardNumbers();
+      }, 300);
+    }
+
+    function updateCardNumbers() {
+      const cards = document.querySelectorAll('.card-item');
+      cards.forEach((card, index) => {
+        const badge = card.querySelector('.card-badge');
+        if (badge) badge.innerText = index + 1;
+        
+        // 更新刪除按鈕
+        const header = card.querySelector('.card-header');
+        const existingBtn = header.querySelector('.btn-delete-card');
+        
+        if (index === 0 && existingBtn) {
+          existingBtn.remove();
+        } else if (index > 0 && !existingBtn) {
+          const btn = document.createElement('button');
+          btn.className = 'btn-delete-card';
+          btn.onclick = function() { removeCard(this); };
+          btn.innerText = '移除';
+          header.appendChild(btn);
+        }
+      });
+    }
+
+    // ===== 工具函數 =====
+    function parseOrderContent(content) {
+      return content.split('\n').map(line => {
+        const parts = line.split(',');
+        return {
+          model: parts[0] ? parts[0].trim() : '',
+          size: parts[1] ? parts[1].trim() : '',
+          qty: parts[2] ? parts[2].trim() : '',
+          color: parts[3] ? parts[3].trim() : ''
+        };
+      }).filter(item => item.model);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
     }
   </script>
 </body>

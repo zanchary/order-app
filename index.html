@@ -32,1305 +32,450 @@
       --radius-sm: 10px;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(0, 184, 148, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
 
-    body {
-      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding-bottom: 100px;
-      overflow-x: hidden;
-    }
+    .view-section { display: none; position: relative; z-index: 1; }
+    .active-view { display: block; animation: fadeIn 0.3s ease; }
 
-    /* 背景裝飾 */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 184, 148, 0.05) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .view-section { 
-      display: none;
-      position: relative;
-      z-index: 1;
-    }
-    .active-view { 
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
+    .header { background: rgba(18, 18, 26, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { display: flex; align-items: center; gap: 10px; }
+    .header-icon { width: 36px; height: 36px; background: var(--gradient-accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .header h2 span { color: var(--accent); }
+    .btn-nav { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 10px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+    .btn-nav:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+    .btn-nav:active { transform: scale(0.97); }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .content-area { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* 註冊頁面 */
+    .register-container { min-height: calc(100vh - 100px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+    .register-icon { width: 120px; height: 120px; background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(0, 184, 148, 0.1) 100%); border-radius: 60px; display: flex; align-items: center; justify-content: center; font-size: 56px; margin-bottom: 32px; animation: float 3s ease-in-out infinite; border: 2px solid rgba(0, 212, 170, 0.3); }
+    .register-title { font-size: 28px; font-weight: 900; margin-bottom: 12px; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .register-subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 40px; line-height: 1.6; }
+    .register-card { background: var(--gradient-card); border-radius: var(--radius); padding: 32px 24px; width: 100%; max-width: 400px; border: 1px solid var(--border); box-shadow: var(--shadow-card); }
+    .register-card h3 { font-size: 18px; margin-bottom: 8px; color: var(--text-primary); }
+    .register-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .register-input { width: 100%; height: 56px; padding: 0 20px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 18px; font-weight: 500; background: var(--bg-secondary); color: var(--text-primary); transition: all 0.2s ease; font-family: inherit; margin-bottom: 20px; }
+    .register-input::placeholder { color: var(--text-muted); }
+    .register-input:focus { border-color: var(--accent); background: var(--bg-primary); outline: none; box-shadow: 0 0 0 4px var(--accent-glow); }
+    .register-btn { width: 100%; height: 56px; background: var(--gradient-accent); color: var(--bg-primary); border: none; border-radius: var(--radius-sm); font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+    .register-btn:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
+    .register-btn:active { transform: scale(0.98); }
+    .register-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .register-features { display: flex; flex-direction: column; gap: 16px; margin-top: 40px; width: 100%; max-width: 400px; }
+    .feature-item { display: flex; align-items: center; gap: 16px; background: var(--bg-card); padding: 16px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .feature-icon { width: 44px; height: 44px; background: rgba(0, 212, 170, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .feature-text { text-align: left; }
+    .feature-text h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .feature-text p { font-size: 13px; color: var(--text-muted); }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.2); }
-      50% { box-shadow: 0 0 30px rgba(0, 212, 170, 0.4); }
-    }
-
-    /* Header */
-    .header {
-      background: rgba(18, 18, 26, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--gradient-accent);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .header h2 {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .header h2 span {
-      color: var(--accent);
-    }
-
-    .btn-nav {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-nav:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--accent);
-    }
-
-    .btn-nav:active {
-      transform: scale(0.97);
-    }
-
-    /* 內容區域 */
-    .content-area {
-      padding: 20px 16px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
+    /* 業務模式 */
+    .mode-switch { background: var(--bg-card); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .mode-tab { flex: 1; padding: 12px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s ease; text-align: center; }
+    .mode-tab.active { background: rgba(0, 212, 170, 0.1); border-color: var(--accent); }
+    .mode-tab-icon { font-size: 24px; margin-bottom: 6px; }
+    .mode-tab-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .mode-tab.active .mode-tab-label { color: var(--accent); }
+    .agent-selector { display: none; }
+    .agent-selector.show { display: block; animation: fadeIn 0.3s ease; }
+    .agent-selector label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
+    .agent-input-group { display: flex; gap: 10px; }
+    .agent-select, .agent-input { flex: 1; height: 48px; padding: 0 16px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; }
+    .agent-select:focus, .agent-input:focus { border-color: var(--accent); outline: none; }
+    .agent-input { display: none; }
+    .agent-input.show { display: block; }
 
     /* 訂單卡片 */
-    .order-card {
-      background: var(--gradient-card);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-      animation: slideUp 0.4s ease backwards;
-    }
-
-    .order-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--gradient-accent);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .card-number {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .card-badge {
-      background: var(--accent);
-      color: var(--bg-primary);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    .card-label {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    .btn-delete-card {
-      background: rgba(255, 71, 87, 0.1);
-      color: var(--danger);
-      border: 1px solid rgba(255, 71, 87, 0.3);
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-delete-card:hover {
-      background: rgba(255, 71, 87, 0.2);
-    }
-
-    /* 輸入框群組 */
-    .input-group {
-      margin-bottom: 16px;
-    }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    input {
-      width: 100%;
-      height: 52px;
-      padding: 0 16px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 16px;
-      font-weight: 500;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-
-    input::placeholder {
-      color: var(--text-muted);
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      background: var(--bg-primary);
-      outline: none;
-      box-shadow: 0 0 0 4px var(--accent-glow);
-    }
-
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
-
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-    }
-
-    /* 底部操作列 */
-    .footer-actions {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(18, 18, 26, 0.98);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 16px 20px;
-      padding-bottom: calc(16px + env(safe-area-inset-bottom));
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 12px;
-      z-index: 200;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 16px 20px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-add {
-      background: var(--bg-card);
-      color: var(--accent);
-      border: 2px solid var(--accent);
-      flex: 0 0 60px;
-    }
-
-    .btn-add:hover {
-      background: rgba(0, 212, 170, 0.1);
-    }
-
-    .btn-send {
-      background: var(--gradient-accent);
-      color: var(--bg-primary);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-send::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn-send:hover::before {
-      left: 100%;
-    }
-
-    .btn-send:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* 歷史紀錄卡片 */
-    .history-card {
-      background: var(--gradient-card);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--border);
-      animation: slideUp 0.4s ease backwards;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .history-card.editable::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--gradient-accent);
-    }
-
-    .history-card.expired::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--danger);
-    }
-
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-
-    .history-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .history-time {
-      font-size: 14px;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .history-id {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: 'SF Mono', 'Fira Code', monospace;
-    }
-
-    .history-status {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 20px;
-    }
-
-    .status-active {
-      background: rgba(0, 212, 170, 0.15);
-      color: var(--accent);
-    }
-
-    .status-expired {
-      background: rgba(255, 71, 87, 0.15);
-      color: var(--danger);
-    }
-
-    .history-content {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .order-item {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 8px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-    }
-
-    .order-item:last-child {
-      border-bottom: none;
-    }
-
-    .order-item-label {
-      color: var(--text-muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .order-item-value {
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    .history-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-action:active {
-      transform: scale(0.97);
-    }
-
-    .btn-edit {
-      background: rgba(255, 165, 2, 0.15);
-      color: var(--warning);
-      border: 1px solid rgba(255, 165, 2, 0.3);
-    }
-
-    .btn-edit:hover {
-      background: rgba(255, 165, 2, 0.25);
-    }
-
-    .btn-del {
-      background: rgba(255, 71, 87, 0.15);
-      color: var(--danger);
-      border: 1px solid rgba(255, 71, 87, 0.3);
-    }
-
-    .btn-del:hover {
-      background: rgba(255, 71, 87, 0.25);
-    }
-
-    .btn-refresh {
-      width: 100%;
-      margin-top: 20px;
-      padding: 16px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-refresh:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--accent);
-    }
-
-    .btn-refresh:active {
-      transform: scale(0.98);
-    }
-
-    /* 空狀態 */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-secondary);
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.5;
-    }
-
-    .empty-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-primary);
-    }
-
-    .empty-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    /* 載入遮罩 */
-    #loading-mask {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--bg-primary);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .loader {
-      width: 60px;
-      height: 60px;
-      position: relative;
-    }
-
-    .loader::before,
-    .loader::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-    }
-
-    .loader::before {
-      width: 100%;
-      height: 100%;
-      border: 3px solid var(--border);
-    }
-
-    .loader::after {
-      width: 100%;
-      height: 100%;
-      border: 3px solid transparent;
-      border-top-color: var(--accent);
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    #loading-text {
-      font-size: 16px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    #gate-btn {
-      margin-top: 12px;
-      padding: 14px 40px;
-      background: var(--gradient-accent);
-      color: var(--bg-primary);
-      border: none;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: none;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-
-    #gate-btn:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-glow);
-    }
-
-    /* 骨架屏 */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: var(--radius-sm);
-    }
-
-    .skeleton-card {
-      background: var(--gradient-card);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      border: 1px solid var(--border);
-    }
-
-    .skeleton-line {
-      height: 16px;
-      margin-bottom: 12px;
-    }
-
-    .skeleton-line.short {
-      width: 60%;
-    }
-
-    .skeleton-line.medium {
-      width: 80%;
-    }
-
-    .skeleton-box {
-      height: 100px;
-      margin-bottom: 12px;
-    }
-
-    /* Toast 通知 */
-    .toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      padding: 14px 24px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-card);
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 500;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-      border-color: var(--accent);
-    }
-
-    .toast.error {
-      border-color: var(--danger);
-    }
-
-    /* 倒數計時 */
-    .countdown {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--warning);
-      font-weight: 600;
-    }
-
-    .countdown-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--warning);
-      border-radius: 50%;
-      animation: pulse 1s infinite;
-    }
-
-    /* 確認對話框 */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin: 20px;
-      max-width: 360px;
-      width: 100%;
-      border: 1px solid var(--border);
-      transform: scale(0.9);
-      transition: all 0.3s ease;
-    }
-
-    .modal-overlay.show .modal {
-      transform: scale(1);
-    }
-
-    .modal-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-    }
-
-    .modal-icon.warning {
-      background: rgba(255, 71, 87, 0.15);
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .modal-desc {
-      font-size: 14px;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .modal-btn {
-      flex: 1;
-      padding: 14px;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-    }
-
-    .modal-btn-cancel {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-    }
-
-    .modal-btn-confirm {
-      background: var(--danger);
-      color: white;
-    }
+    .order-card { background: var(--gradient-card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border); position: relative; overflow: hidden; animation: slideUp 0.4s ease backwards; }
+    .order-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-accent); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-number { display: flex; align-items: center; gap: 10px; }
+    .card-badge { background: var(--accent); color: var(--bg-primary); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .card-label { color: var(--text-secondary); font-size: 14px; }
+    .btn-delete-card { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid rgba(255, 71, 87, 0.3); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
+    .btn-delete-card:hover { background: rgba(255, 71, 87, 0.2); }
+
+    .input-group { margin-bottom: 16px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.5px; }
+    label .required { color: var(--danger); margin-left: 2px; }
+    input, textarea { width: 100%; padding: 0 16px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; font-weight: 500; background: var(--bg-secondary); color: var(--text-primary); transition: all 0.2s ease; font-family: inherit; }
+    input { height: 52px; }
+    textarea { padding: 14px 16px; min-height: 80px; resize: vertical; line-height: 1.5; }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    input:focus, textarea:focus { border-color: var(--accent); background: var(--bg-primary); outline: none; box-shadow: 0 0 0 4px var(--accent-glow); }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* 備註區塊 */
+    .remark-section { background: var(--bg-card); border-radius: var(--radius); padding: 20px; margin-top: 20px; border: 1px solid var(--border); }
+    .remark-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .remark-icon { font-size: 20px; }
+    .remark-title { font-size: 16px; font-weight: 600; }
+
+    /* 底部操作 */
+    .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(18, 18, 26, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 16px 20px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; gap: 12px; z-index: 200; }
+    .btn { flex: 1; padding: 16px 20px; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn:active { transform: scale(0.97); }
+    .btn-add { background: var(--bg-card); color: var(--accent); border: 2px solid var(--accent); flex: 0 0 60px; }
+    .btn-add:hover { background: rgba(0, 212, 170, 0.1); }
+    .btn-send { background: var(--gradient-accent); color: var(--bg-primary); position: relative; overflow: hidden; }
+    .btn-send::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
+    .btn-send:hover::before { left: 100%; }
+    .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* 歷史紀錄 */
+    .history-card { background: var(--gradient-card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border); animation: slideUp 0.4s ease backwards; position: relative; overflow: hidden; }
+    .history-card.editable::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-accent); }
+    .history-card.expired::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--danger); }
+    .history-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .history-meta { display: flex; flex-direction: column; gap: 4px; }
+    .history-time { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+    .history-id { font-size: 12px; color: var(--text-muted); font-family: 'SF Mono', 'Fira Code', monospace; }
+    .history-status { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px; }
+    .status-active { background: rgba(0, 212, 170, 0.15); color: var(--accent); }
+    .status-expired { background: rgba(255, 71, 87, 0.15); color: var(--danger); }
+    .history-content { background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; }
+    .order-item { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .order-item:last-child { border-bottom: none; }
+    .order-item-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .order-item-value { color: var(--text-primary); font-weight: 500; }
+    .history-remark { background: rgba(255, 165, 2, 0.1); border: 1px solid rgba(255, 165, 2, 0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; }
+    .history-remark-label { font-size: 12px; color: var(--warning); font-weight: 600; margin-bottom: 6px; }
+    .history-remark-text { font-size: 14px; color: var(--text-primary); line-height: 1.5; }
+    .history-actions { display: flex; gap: 10px; }
+    .btn-action { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-action:active { transform: scale(0.97); }
+    .btn-edit { background: rgba(255, 165, 2, 0.15); color: var(--warning); border: 1px solid rgba(255, 165, 2, 0.3); }
+    .btn-edit:hover { background: rgba(255, 165, 2, 0.25); }
+    .btn-del { background: rgba(255, 71, 87, 0.15); color: var(--danger); border: 1px solid rgba(255, 71, 87, 0.3); }
+    .btn-del:hover { background: rgba(255, 71, 87, 0.25); }
+    .btn-refresh { width: 100%; margin-top: 20px; padding: 16px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-refresh:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+    .empty-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+    .empty-desc { font-size: 14px; color: var(--text-muted); }
+
+    #loading-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-primary); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 24px; }
+    .loader { width: 60px; height: 60px; position: relative; }
+    .loader::before, .loader::after { content: ''; position: absolute; border-radius: 50%; }
+    .loader::before { width: 100%; height: 100%; border: 3px solid var(--border); }
+    .loader::after { width: 100%; height: 100%; border: 3px solid transparent; border-top-color: var(--accent); animation: spin 1s linear infinite; }
+    #loading-text { font-size: 16px; color: var(--text-secondary); font-weight: 500; }
+    #gate-btn { margin-top: 12px; padding: 14px 40px; background: var(--gradient-accent); color: var(--bg-primary); border: none; border-radius: 30px; font-size: 16px; font-weight: 700; cursor: pointer; display: none; transition: all 0.2s ease; font-family: inherit; }
+    #gate-btn:hover { transform: scale(1.05); box-shadow: var(--shadow-glow); }
+
+    .skeleton { background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+    .skeleton-card { background: var(--gradient-card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
+    .skeleton-line { height: 16px; margin-bottom: 12px; }
+    .skeleton-line.short { width: 60%; }
+    .skeleton-box { height: 100px; margin-bottom: 12px; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg-card); color: var(--text-primary); padding: 14px 24px; border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow-card); z-index: 1000; opacity: 0; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--accent); }
+    .toast.error { border-color: var(--danger); }
+
+    .countdown { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--warning); font-weight: 600; }
+    .countdown-dot { width: 6px; height: 6px; background: var(--warning); border-radius: 50%; animation: pulse 1s infinite; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal { background: var(--bg-card); border-radius: var(--radius); padding: 28px; margin: 20px; max-width: 360px; width: 100%; border: 1px solid var(--border); transform: scale(0.9); transition: all 0.3s ease; }
+    .modal-overlay.show .modal { transform: scale(1); }
+    .modal-icon { width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .modal-icon.warning { background: rgba(255, 71, 87, 0.15); }
+    .modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 12px; }
+    .modal-desc { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 24px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; }
+    .modal-btn { flex: 1; padding: 14px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .modal-btn-cancel { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+    .modal-btn-confirm { background: var(--danger); color: white; }
+
+    .order-info-bar { background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.3); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .order-info-icon { font-size: 24px; }
+    .order-info-text { flex: 1; }
+    .order-info-label { font-size: 12px; color: var(--text-muted); }
+    .order-info-value { font-size: 16px; font-weight: 600; color: var(--accent); }
   </style>
 </head>
 <body>
-
-  <!-- 載入遮罩 -->
   <div id="loading-mask">
     <div class="loader"></div>
     <div id="loading-text">系統連線中...</div>
     <button id="gate-btn" onclick="liff.login({scope:'profile chat_message.write'})">登入 LINE</button>
   </div>
 
-  <!-- Toast 通知 -->
   <div id="toast" class="toast"></div>
 
-  <!-- 確認對話框 -->
   <div id="modal" class="modal-overlay">
     <div class="modal">
       <div class="modal-icon warning">⚠️</div>
       <div class="modal-title" id="modal-title">確認刪除</div>
-      <div class="modal-desc" id="modal-desc">確定要刪除這筆訂單嗎？此操作無法復原。</div>
+      <div class="modal-desc" id="modal-desc">確定要刪除這筆訂單嗎？</div>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-cancel" onclick="hideModal()">取消</button>
-        <button class="modal-btn modal-btn-confirm" id="modal-confirm">確認刪除</button>
+        <button class="modal-btn modal-btn-confirm" id="modal-confirm">確認</button>
       </div>
     </div>
   </div>
 
-  <!-- 新增訂單頁面 -->
+  <!-- 註冊頁面 -->
+  <div id="view-register" class="view-section">
+    <div class="register-container">
+      <div class="register-icon">👋</div>
+      <h1 class="register-title">歡迎使用訂購系統</h1>
+      <p class="register-subtitle">請先完成註冊，讓我們知道您代表哪間公司</p>
+      <div class="register-card">
+        <h3>公司名稱</h3>
+        <p>請輸入您的公司或商號名稱</p>
+        <input type="text" id="register-company" class="register-input" placeholder="例如：ABC 股份有限公司">
+        <button class="register-btn" onclick="submitRegister()">開始使用</button>
+      </div>
+      <div class="register-features">
+        <div class="feature-item"><div class="feature-icon">⚡</div><div class="feature-text"><h4>快速下單</h4><p>簡單介面，快速完成訂購</p></div></div>
+        <div class="feature-item"><div class="feature-icon">📝</div><div class="feature-text"><h4>即時修改</h4><p>下單後 3 分鐘內可修改或取消</p></div></div>
+        <div class="feature-item"><div class="feature-icon">📋</div><div class="feature-text"><h4>訂單紀錄</h4><p>隨時查看待處理訂單狀態</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下單頁面 -->
   <div id="view-form" class="view-section">
     <div class="header">
-      <div class="header-title">
-        <div class="header-icon">📝</div>
-        <h2 id="form-title"><span>新增</span>訂單</h2>
-      </div>
-      <button class="btn-nav" onclick="showHistoryView()">
-        <span>📋</span> 查看紀錄
-      </button>
+      <div class="header-title"><div class="header-icon">📝</div><h2 id="form-title"><span>新增</span>訂單</h2></div>
+      <button class="btn-nav" onclick="showHistoryView()"><span>📋</span> 查看紀錄</button>
     </div>
     <div class="content-area">
+      <div class="order-info-bar" id="order-info-bar">
+        <div class="order-info-icon">🏢</div>
+        <div class="order-info-text"><div class="order-info-label">下單公司</div><div class="order-info-value" id="current-company">-</div></div>
+      </div>
+      <div class="mode-switch" id="mode-switch" style="display:none;">
+        <div class="mode-tabs">
+          <div class="mode-tab active" data-mode="self" onclick="switchMode('self')"><div class="mode-tab-icon">👤</div><div class="mode-tab-label">自己下單</div></div>
+          <div class="mode-tab" data-mode="agent" onclick="switchMode('agent')"><div class="mode-tab-icon">🤝</div><div class="mode-tab-label">代客下單</div></div>
+        </div>
+        <div class="agent-selector" id="agent-selector">
+          <label>選擇客戶公司</label>
+          <div class="agent-input-group">
+            <select class="agent-select" id="agent-select" onchange="onAgentSelectChange()"><option value="">-- 選擇客戶 --</option><option value="__new__">➕ 輸入新客戶</option></select>
+            <input type="text" class="agent-input" id="agent-input" placeholder="輸入公司名稱">
+          </div>
+        </div>
+      </div>
       <div id="order-list"></div>
+      <div class="remark-section">
+        <div class="remark-header"><span class="remark-icon">📝</span><span class="remark-title">訂單備註</span></div>
+        <textarea id="order-remark" placeholder="如有特殊需求請在此說明，例如：急件請優先處理、指定配送時間等..."></textarea>
+      </div>
     </div>
     <div class="footer-actions">
       <button class="btn btn-add" onclick="addItem()">＋</button>
-      <button class="btn btn-send" id="btn-submit" onclick="submitOrder()">
-        <span>✓</span> 確認送出
-      </button>
+      <button class="btn btn-send" onclick="submitOrder()"><span>✓</span> 確認送出</button>
     </div>
   </div>
 
-  <!-- 歷史紀錄頁面 -->
+  <!-- 歷史紀錄 -->
   <div id="view-history" class="view-section">
     <div class="header">
-      <div class="header-title">
-        <div class="header-icon">📋</div>
-        <h2><span>待處理</span>訂單</h2>
-      </div>
-      <button class="btn-nav" onclick="showFormView()">
-        <span>➕</span> 我要下單
-      </button>
+      <div class="header-title"><div class="header-icon">📋</div><h2><span>待處理</span>訂單</h2></div>
+      <button class="btn-nav" onclick="showFormView()"><span>➕</span> 我要下單</button>
     </div>
     <div class="content-area">
       <div id="history-container"></div>
-      <button class="btn-refresh" onclick="fetchHistory()">
-        <span>🔄</span> 重新整理
-      </button>
+      <button class="btn-refresh" onclick="fetchHistory()"><span>🔄</span> 重新整理</button>
     </div>
   </div>
 
   <script>
-    // ⚠️ 設定區
-    const LIFF_ID = '2008839956-KquncO8W'; 
+    const LIFF_ID = '2008839956-KquncO8W';
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxSxQMULkJwhjldW0eMWUbesEjxy3Kg0rYQpG7RJufIhzQMtvA9ZlenyEbaQBFkgW52mw/exec';
 
-    let currentOrderId = null;
-    let pendingDeleteId = null;
-    let countdownIntervals = {};
+    let currentOrderId = null, pendingDeleteId = null, countdownIntervals = {}, userInfo = null, customerList = [], currentMode = 'self';
 
-    // ===== 初始化 =====
     window.onload = function() {
       liff.init({ liffId: LIFF_ID }).then(() => {
         if (!liff.isLoggedIn()) {
           document.getElementById('loading-text').innerText = "請先登入 LINE";
           document.getElementById('gate-btn').style.display = 'block';
-        } else {
-          checkRoute();
-        }
+        } else { initApp(); }
       }).catch(err => showToast("初始化失敗: " + err, 'error'));
     };
 
+    function initApp() {
+      const context = liff.getContext();
+      if (!context || !context.userId) { showToast("無法取得使用者資訊", 'error'); return; }
+      callApi({ action: 'getUserInfo', userId: context.userId }, (resp) => {
+        document.getElementById('loading-mask').style.display = 'none';
+        if (resp.result === 'success') {
+          userInfo = resp.user;
+          customerList = resp.customers || [];
+          if (!userInfo.isRegistered) { showRegisterView(); }
+          else {
+            document.getElementById('current-company').innerText = userInfo.companyName;
+            if (userInfo.isSales) { document.getElementById('mode-switch').style.display = 'block'; populateCustomerList(); }
+            checkRoute();
+          }
+        } else { showRegisterView(); }
+      });
+    }
+
     function checkRoute() {
       const params = new URLSearchParams(window.location.search);
-      const page = params.get('page');
-      document.getElementById('loading-mask').style.display = 'none';
-      if (page === 'history') showHistoryView();
-      else showFormView();
+      if (params.get('page') === 'history') showHistoryView(); else showFormView();
     }
 
-    // ===== 頁面切換 =====
+    function hideAllViews() { document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view')); }
+    function showRegisterView() { hideAllViews(); document.getElementById('view-register').classList.add('active-view'); }
     function showFormView() {
+      hideAllViews();
       document.getElementById('view-form').classList.add('active-view');
-      document.getElementById('view-history').classList.remove('active-view');
       if(document.getElementById('order-list').innerHTML === '') addItem();
-      
-      const title = document.getElementById('form-title');
-      if(currentOrderId) {
-        title.innerHTML = '<span>修改</span>訂單';
-      } else {
-        title.innerHTML = '<span>新增</span>訂單';
-      }
+      document.getElementById('form-title').innerHTML = currentOrderId ? '<span>修改</span>訂單' : '<span>新增</span>訂單';
+    }
+    function showHistoryView() { hideAllViews(); document.getElementById('view-history').classList.add('active-view'); fetchHistory(); }
+
+    function submitRegister() {
+      const companyName = document.getElementById('register-company').value.trim();
+      if (!companyName) { showToast("請輸入公司名稱", 'error'); return; }
+      const context = liff.getContext();
+      if (!context || !context.userId) { showToast("無法取得使用者資訊", 'error'); return; }
+      callApi({ action: 'register', userId: context.userId, companyName: companyName }, (resp) => {
+        if (resp.result === 'success') {
+          showToast("註冊成功！歡迎使用", 'success');
+          userInfo = { companyName: companyName, isRegistered: true, isSales: false };
+          document.getElementById('current-company').innerText = companyName;
+          showFormView();
+        } else { showToast("註冊失敗: " + resp.msg, 'error'); }
+      });
     }
 
-    function showHistoryView() {
-      document.getElementById('view-form').classList.remove('active-view');
-      document.getElementById('view-history').classList.add('active-view');
-      fetchHistory();
+    function switchMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+      const agentSelector = document.getElementById('agent-selector'), orderInfoBar = document.getElementById('order-info-bar');
+      if (mode === 'agent') { agentSelector.classList.add('show'); updateOrderInfoBar(); }
+      else { agentSelector.classList.remove('show'); document.getElementById('current-company').innerText = userInfo.companyName; orderInfoBar.style.background = 'rgba(0, 212, 170, 0.1)'; orderInfoBar.style.borderColor = 'rgba(0, 212, 170, 0.3)'; }
     }
 
-    // ===== API 呼叫 =====
+    function populateCustomerList() {
+      const select = document.getElementById('agent-select');
+      select.innerHTML = '<option value="">-- 選擇客戶 --</option><option value="__new__">➕ 輸入新客戶</option>';
+      customerList.forEach(c => { const opt = document.createElement('option'); opt.value = c.name; opt.textContent = c.name; select.appendChild(opt); });
+    }
+
+    function onAgentSelectChange() {
+      const select = document.getElementById('agent-select'), input = document.getElementById('agent-input');
+      if (select.value === '__new__') { input.classList.add('show'); input.focus(); } else { input.classList.remove('show'); input.value = ''; }
+      updateOrderInfoBar();
+    }
+
+    function updateOrderInfoBar() {
+      const select = document.getElementById('agent-select'), input = document.getElementById('agent-input'), orderInfoBar = document.getElementById('order-info-bar'), companyDisplay = document.getElementById('current-company');
+      let companyName = select.value === '__new__' ? (input.value.trim() || '請輸入客戶名稱') : (select.value || '請選擇客戶');
+      companyDisplay.innerText = companyName;
+      orderInfoBar.style.background = 'rgba(255, 165, 2, 0.1)'; orderInfoBar.style.borderColor = 'rgba(255, 165, 2, 0.3)';
+    }
+
+    document.getElementById('agent-input')?.addEventListener('input', updateOrderInfoBar);
+
     function callApi(data, callback) {
       showLoading("處理中...");
-      
-      fetch(GAS_URL, { 
-        method: 'POST', 
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(json => {
-        hideLoading();
-        callback(json);
-      })
-      .catch(err => {
-        hideLoading();
-        showToast("連線錯誤: " + err, 'error');
-      });
+      fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) }).then(res => res.json()).then(json => { hideLoading(); callback(json); }).catch(err => { hideLoading(); showToast("連線錯誤: " + err, 'error'); });
     }
 
-    // ===== 載入狀態 =====
-    function showLoading(text) {
-      const mask = document.getElementById('loading-mask');
-      const loadingText = document.getElementById('loading-text');
-      loadingText.innerText = text || "處理中...";
-      document.getElementById('gate-btn').style.display = 'none';
-      mask.style.display = 'flex';
-    }
+    function showLoading(text) { document.getElementById('loading-text').innerText = text || "處理中..."; document.getElementById('gate-btn').style.display = 'none'; document.getElementById('loading-mask').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-mask').style.display = 'none'; }
+    function showToast(msg, type = 'success') { const t = document.getElementById('toast'); t.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${msg}`; t.className = `toast ${type} show`; setTimeout(() => t.classList.remove('show'), 3000); }
+    function showModal(title, desc, onConfirm) { document.getElementById('modal-title').innerText = title; document.getElementById('modal-desc').innerText = desc; document.getElementById('modal-confirm').onclick = onConfirm; document.getElementById('modal').classList.add('show'); }
+    function hideModal() { document.getElementById('modal').classList.remove('show'); }
 
-    function hideLoading() {
-      document.getElementById('loading-mask').style.display = 'none';
-    }
-
-    // ===== Toast 通知 =====
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const icon = type === 'success' ? '✓' : '✕';
-      toast.innerHTML = `<span>${icon}</span> ${message}`;
-      toast.className = `toast ${type} show`;
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    // ===== Modal 對話框 =====
-    function showModal(title, desc, onConfirm) {
-      document.getElementById('modal-title').innerText = title;
-      document.getElementById('modal-desc').innerText = desc;
-      document.getElementById('modal-confirm').onclick = onConfirm;
-      document.getElementById('modal').classList.add('show');
-    }
-
-    function hideModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    // ===== 取得歷史訂單 =====
     function fetchHistory() {
-      const context = liff.getContext();
-      if (!context || !context.userId) return;
-      
-      const userId = context.userId;
+      const context = liff.getContext(); if (!context || !context.userId) return;
       const container = document.getElementById('history-container');
-      
-      // 顯示骨架屏
-      container.innerHTML = `
-        <div class="skeleton-card">
-          <div class="skeleton skeleton-line short"></div>
-          <div class="skeleton skeleton-box"></div>
-          <div class="skeleton skeleton-line medium"></div>
-        </div>
-        <div class="skeleton-card">
-          <div class="skeleton skeleton-line short"></div>
-          <div class="skeleton skeleton-box"></div>
-          <div class="skeleton skeleton-line medium"></div>
-        </div>
-      `;
-
-      // 清除所有倒數計時
-      Object.keys(countdownIntervals).forEach(key => {
-        clearInterval(countdownIntervals[key]);
-      });
-      countdownIntervals = {};
-
-      callApi({ action: 'getOrders', userId: userId }, (resp) => {
+      container.innerHTML = '<div class="skeleton-card"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-box"></div></div>';
+      Object.keys(countdownIntervals).forEach(key => clearInterval(countdownIntervals[key])); countdownIntervals = {};
+      callApi({ action: 'getOrders', userId: context.userId }, (resp) => {
         container.innerHTML = '';
-
-        if (!resp.orders || resp.orders.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">📦</div>
-              <div class="empty-title">目前沒有待處理訂單</div>
-              <div class="empty-desc">點擊「我要下單」開始建立新訂單</div>
-            </div>
-          `;
-          return;
-        }
-
+        if (!resp.orders || resp.orders.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">目前沒有待處理訂單</div><div class="empty-desc">點擊「我要下單」開始建立新訂單</div></div>'; return; }
         resp.orders.forEach((order, index) => {
-          const div = document.createElement('div');
-          const isEditable = order.remaining > 0;
-          div.className = `history-card ${isEditable ? 'editable' : 'expired'}`;
-          div.style.animationDelay = `${index * 0.1}s`;
-          
-          // 解析訂單內容
+          const div = document.createElement('div'), isEditable = order.remaining > 0;
+          div.className = `history-card ${isEditable ? 'editable' : 'expired'}`; div.style.animationDelay = `${index * 0.1}s`;
           const items = parseOrderContent(order.content);
-          let itemsHtml = items.map(item => `
-            <div class="order-item">
-              <div>
-                <div class="order-item-label">型號</div>
-                <div class="order-item-value">${escapeHtml(item.model)}</div>
-              </div>
-              <div>
-                <div class="order-item-label">尺寸</div>
-                <div class="order-item-value">${escapeHtml(item.size)}</div>
-              </div>
-              <div>
-                <div class="order-item-label">數量</div>
-                <div class="order-item-value">${escapeHtml(item.qty)}</div>
-              </div>
-              <div>
-                <div class="order-item-label">顏色</div>
-                <div class="order-item-value">${escapeHtml(item.color) || '-'}</div>
-              </div>
-            </div>
-          `).join('');
-
-          let statusHtml = '';
-          let actionsHtml = '';
-          
-          if (isEditable) {
-            statusHtml = `
-              <div class="history-status status-active">
-                <span class="countdown" id="countdown-${order.orderId}">
-                  <span class="countdown-dot"></span>
-                  剩餘 ${formatTime(order.remaining)}
-                </span>
-              </div>
-            `;
-            actionsHtml = `
-              <div class="history-actions">
-                <button class="btn-action btn-edit" onclick="loadEdit('${order.orderId}', '${encodeURIComponent(order.content)}')">
-                  ✏️ 修改
-                </button>
-                <button class="btn-action btn-del" onclick="confirmDelete('${order.orderId}')">
-                  🗑️ 刪除
-                </button>
-              </div>
-            `;
-            
-            // 啟動倒數計時
-            startCountdown(order.orderId, order.remaining);
-          } else {
-            statusHtml = `<div class="history-status status-expired">已逾時</div>`;
-            actionsHtml = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:10px;">已超過修改時限</div>`;
-          }
-
-          div.innerHTML = `
-            <div class="history-header">
-              <div class="history-meta">
-                <div class="history-time">📅 ${order.time}</div>
-                <div class="history-id">${order.orderId}</div>
-              </div>
-              ${statusHtml}
-            </div>
-            <div class="history-content">${itemsHtml}</div>
-            ${actionsHtml}
-          `;
-          
+          let itemsHtml = items.map(item => `<div class="order-item"><div><div class="order-item-label">型號</div><div class="order-item-value">${escapeHtml(item.model)}</div></div><div><div class="order-item-label">尺寸</div><div class="order-item-value">${escapeHtml(item.size) || '-'}</div></div><div><div class="order-item-label">數量</div><div class="order-item-value">${escapeHtml(item.qty)}</div></div><div><div class="order-item-label">顏色</div><div class="order-item-value">${escapeHtml(item.color) || '-'}</div></div></div>`).join('');
+          let remarkHtml = order.remark ? `<div class="history-remark"><div class="history-remark-label">📝 備註</div><div class="history-remark-text">${escapeHtml(order.remark)}</div></div>` : '';
+          let statusHtml = isEditable ? `<div class="history-status status-active"><span class="countdown" id="countdown-${order.orderId}"><span class="countdown-dot"></span> 剩餘 ${formatTime(order.remaining)}</span></div>` : `<div class="history-status status-expired">已逾時</div>`;
+          let actionsHtml = isEditable ? `<div class="history-actions"><button class="btn-action btn-edit" onclick="loadEdit('${order.orderId}', '${encodeURIComponent(order.content)}', '${encodeURIComponent(order.remark || '')}')">✏️ 修改</button><button class="btn-action btn-del" onclick="confirmDelete('${order.orderId}')">🗑️ 刪除</button></div>` : `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:10px;">已超過修改時限</div>`;
+          if (isEditable) startCountdown(order.orderId, order.remaining);
+          div.innerHTML = `<div class="history-header"><div class="history-meta"><div class="history-time">📅 ${order.time}</div><div class="history-id">${order.orderId}</div></div>${statusHtml}</div><div class="history-content">${itemsHtml}</div>${remarkHtml}${actionsHtml}`;
           container.appendChild(div);
         });
       });
     }
 
-    // ===== 倒數計時 =====
     function startCountdown(orderId, seconds) {
       let remaining = seconds;
-      
       countdownIntervals[orderId] = setInterval(() => {
         remaining--;
         const el = document.getElementById(`countdown-${orderId}`);
-        
-        if (remaining <= 0) {
-          clearInterval(countdownIntervals[orderId]);
-          if (el) {
-            el.parentElement.className = 'history-status status-expired';
-            el.parentElement.innerHTML = '已逾時';
-          }
-          return;
-        }
-        
-        if (el) {
-          el.innerHTML = `<span class="countdown-dot"></span> 剩餘 ${formatTime(remaining)}`;
-        }
+        if (remaining <= 0) { clearInterval(countdownIntervals[orderId]); if (el) { el.parentElement.className = 'history-status status-expired'; el.parentElement.innerHTML = '已逾時'; } return; }
+        if (el) el.innerHTML = `<span class="countdown-dot"></span> 剩餘 ${formatTime(remaining)}`;
       }, 1000);
     }
 
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = seconds % 60;
-      return `${m}:${s.toString().padStart(2, '0')}`;
-    }
+    function formatTime(s) { return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
 
-    // ===== 載入編輯 =====
-    function loadEdit(orderId, contentEncoded) {
+    function loadEdit(orderId, contentEncoded, remarkEncoded) {
       currentOrderId = orderId;
-      const content = decodeURIComponent(contentEncoded);
       showFormView();
-      
-      const container = document.getElementById('order-list');
-      container.innerHTML = '';
-      
-      const lines = content.split('\n');
-      lines.forEach(line => {
-        const parts = line.split(',');
-        if(parts.length >= 3) {
-          addItem(parts[0].trim(), parts[1].trim(), parts[2].trim(), parts[3] ? parts[3].trim() : '');
-        }
-      });
+      document.getElementById('order-list').innerHTML = '';
+      decodeURIComponent(contentEncoded).split('\n').forEach(line => { const p = line.split(','); if(p.length >= 3) addItem(p[0].trim(), p[1].trim(), p[2].trim(), p[3] ? p[3].trim() : ''); });
+      document.getElementById('order-remark').value = decodeURIComponent(remarkEncoded);
     }
 
-    // ===== 刪除訂單 =====
-    function confirmDelete(orderId) {
-      pendingDeleteId = orderId;
-      showModal(
-        '確認刪除訂單',
-        '刪除後將無法恢復，確定要刪除這筆訂單嗎？',
-        executeDelete
-      );
-    }
+    function confirmDelete(orderId) { pendingDeleteId = orderId; showModal('確認刪除訂單', '刪除後將無法恢復，確定要刪除嗎？', executeDelete); }
+    function executeDelete() { hideModal(); if (!pendingDeleteId) return; callApi({ action: 'delete', orderId: pendingDeleteId }, (resp) => { if(resp.result === 'success') { showToast("訂單已刪除", 'success'); fetchHistory(); } else { showToast("刪除失敗: " + resp.msg, 'error'); } pendingDeleteId = null; }); }
 
-    function executeDelete() {
-      hideModal();
-      if (!pendingDeleteId) return;
-      
-      callApi({ action: 'delete', orderId: pendingDeleteId }, (resp) => {
-        if(resp.result === 'success') {
-          showToast("訂單已成功刪除", 'success');
-          fetchHistory();
-        } else {
-          showToast("刪除失敗: " + resp.msg, 'error');
-        }
-        pendingDeleteId = null;
-      });
-    }
-
-    // ===== 送出訂單 =====
     function submitOrder() {
-      const cards = document.querySelectorAll('.card-item');
-      let lines = [];
-      
-      cards.forEach(card => {
-        const m = card.querySelector('.in-model').value.trim();
-        const s = card.querySelector('.in-size').value.trim();
-        const q = card.querySelector('.in-qty').value.trim();
-        const c = card.querySelector('.in-color').value.trim();
-        if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`);
-      });
-
-      if(lines.length === 0) {
-        showToast("請填寫「型號」與「數量」", 'error');
-        return;
-      }
-
-      const action = currentOrderId ? 'update' : 'create';
-      
-      const context = liff.getContext();
-      if (!context || !context.userId) {
-        showToast("無法取得使用者 ID，請重新登入", 'error');
-        setTimeout(() => location.reload(), 2000);
-        return;
-      }
-
-      const userId = context.userId;
-
-      callApi({
-        action: action,
-        orderId: currentOrderId,
-        userId: userId,
-        content: lines.join('\n')
-      }, (resp) => {
-        if(resp.result === 'success') {
-          showToast(action === 'create' ? "訂單已成功送出！" : "訂單修改成功！", 'success');
-          currentOrderId = null;
-          document.getElementById('order-list').innerHTML = '';
-          addItem();
-          showHistoryView();
-        } else {
-          showToast("操作失敗: " + resp.msg, 'error');
-        }
+      const cards = document.querySelectorAll('.card-item'); let lines = [];
+      cards.forEach(card => { const m = card.querySelector('.in-model').value.trim(), s = card.querySelector('.in-size').value.trim(), q = card.querySelector('.in-qty').value.trim(), c = card.querySelector('.in-color').value.trim(); if(m && q) lines.push(`${m}, ${s}, ${q}, ${c}`); });
+      if(lines.length === 0) { showToast("請填寫「型號」與「數量」", 'error'); return; }
+      let orderCompany = userInfo.companyName;
+      if (currentMode === 'agent') { const sel = document.getElementById('agent-select'), inp = document.getElementById('agent-input'); orderCompany = sel.value === '__new__' ? inp.value.trim() : sel.value; if (!orderCompany) { showToast("請選擇或輸入客戶公司", 'error'); return; } }
+      const remark = document.getElementById('order-remark').value.trim(), action = currentOrderId ? 'update' : 'create', context = liff.getContext();
+      if (!context || !context.userId) { showToast("無法取得使用者 ID", 'error'); return; }
+      callApi({ action: action, orderId: currentOrderId, userId: context.userId, companyName: orderCompany, content: lines.join('\n'), remark: remark, isAgentOrder: currentMode === 'agent', agentName: currentMode === 'agent' ? userInfo.companyName : null }, (resp) => {
+        if(resp.result === 'success') { showToast(action === 'create' ? "訂單已送出！" : "修改成功！", 'success'); currentOrderId = null; document.getElementById('order-list').innerHTML = ''; document.getElementById('order-remark').value = ''; addItem(); showHistoryView(); }
+        else { showToast("操作失敗: " + resp.msg, 'error'); }
       });
     }
 
-    // ===== 新增項目 =====
     function addItem(m='', s='', q='', c='') {
-      const container = document.getElementById('order-list');
-      const count = container.children.length + 1;
-      const div = document.createElement('div');
-      div.className = 'order-card card-item';
-      div.style.animationDelay = `${(count - 1) * 0.1}s`;
-      
-      div.innerHTML = `
-        <div class="card-header">
-          <div class="card-number">
-            <span class="card-badge">${count}</span>
-            <span class="card-label">商品項目</span>
-          </div>
-          ${count > 1 ? '<button class="btn-delete-card" onclick="removeCard(this)">移除</button>' : ''}
-        </div>
-        <div class="input-group">
-          <label>型號 *</label>
-          <input type="text" class="in-model" value="${escapeHtml(m)}" placeholder="輸入產品型號">
-        </div>
-        <div class="input-row">
-          <div class="input-group">
-            <label>尺寸</label>
-            <input type="text" class="in-size" value="${escapeHtml(s)}" placeholder="尺寸">
-          </div>
-          <div class="input-group">
-            <label>數量 *</label>
-            <input type="number" class="in-qty" value="${escapeHtml(q)}" placeholder="數量" min="1">
-          </div>
-        </div>
-        <div class="input-group">
-          <label>顏色</label>
-          <input type="text" class="in-color" value="${escapeHtml(c)}" placeholder="顏色（選填）">
-        </div>
-      `;
-      
+      const container = document.getElementById('order-list'), count = container.children.length + 1, div = document.createElement('div');
+      div.className = 'order-card card-item'; div.style.animationDelay = `${(count - 1) * 0.1}s`;
+      div.innerHTML = `<div class="card-header"><div class="card-number"><span class="card-badge">${count}</span><span class="card-label">商品項目</span></div>${count > 1 ? '<button class="btn-delete-card" onclick="removeCard(this)">移除</button>' : ''}</div><div class="input-group"><label>型號 <span class="required">*</span></label><input type="text" class="in-model" value="${escapeHtml(m)}" placeholder="輸入產品型號"></div><div class="input-row"><div class="input-group"><label>尺寸</label><input type="text" class="in-size" value="${escapeHtml(s)}" placeholder="尺寸"></div><div class="input-group"><label>數量 <span class="required">*</span></label><input type="number" class="in-qty" value="${escapeHtml(q)}" placeholder="數量" min="1"></div></div><div class="input-group"><label>顏色</label><input type="text" class="in-color" value="${escapeHtml(c)}" placeholder="顏色（選填）"></div>`;
       container.appendChild(div);
-      
-      setTimeout(() => {
-        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        div.querySelector('.in-model').focus();
-      }, 100);
+      setTimeout(() => { div.scrollIntoView({ behavior: 'smooth', block: 'center' }); div.querySelector('.in-model').focus(); }, 100);
     }
 
-    function removeCard(btn) {
-      const card = btn.closest('.card-item');
-      card.style.animation = 'fadeIn 0.3s ease reverse';
-      setTimeout(() => {
-        card.remove();
-        updateCardNumbers();
-      }, 300);
-    }
-
-    function updateCardNumbers() {
-      const cards = document.querySelectorAll('.card-item');
-      cards.forEach((card, index) => {
-        const badge = card.querySelector('.card-badge');
-        if (badge) badge.innerText = index + 1;
-        
-        // 更新刪除按鈕
-        const header = card.querySelector('.card-header');
-        const existingBtn = header.querySelector('.btn-delete-card');
-        
-        if (index === 0 && existingBtn) {
-          existingBtn.remove();
-        } else if (index > 0 && !existingBtn) {
-          const btn = document.createElement('button');
-          btn.className = 'btn-delete-card';
-          btn.onclick = function() { removeCard(this); };
-          btn.innerText = '移除';
-          header.appendChild(btn);
-        }
-      });
-    }
-
-    // ===== 工具函數 =====
-    function parseOrderContent(content) {
-      return content.split('\n').map(line => {
-        const parts = line.split(',');
-        return {
-          model: parts[0] ? parts[0].trim() : '',
-          size: parts[1] ? parts[1].trim() : '',
-          qty: parts[2] ? parts[2].trim() : '',
-          color: parts[3] ? parts[3].trim() : ''
-        };
-      }).filter(item => item.model);
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-    }
+    function removeCard(btn) { const card = btn.closest('.card-item'); card.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => { card.remove(); updateCardNumbers(); }, 300); }
+    function updateCardNumbers() { document.querySelectorAll('.card-item').forEach((card, i) => { const badge = card.querySelector('.card-badge'); if (badge) badge.innerText = i + 1; const header = card.querySelector('.card-header'), btn = header.querySelector('.btn-delete-card'); if (i === 0 && btn) btn.remove(); else if (i > 0 && !btn) { const b = document.createElement('button'); b.className = 'btn-delete-card'; b.onclick = function() { removeCard(this); }; b.innerText = '移除'; header.appendChild(b); } }); }
+    function parseOrderContent(content) { return content.split('\n').map(line => { const p = line.split(','); return { model: p[0]?.trim() || '', size: p[1]?.trim() || '', qty: p[2]?.trim() || '', color: p[3]?.trim() || '' }; }).filter(item => item.model); }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
   </script>
 </body>
 </html>

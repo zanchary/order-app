@@ -448,7 +448,7 @@
     }
 
     function confirmDelete(orderId) { pendingDeleteId = orderId; showModal('確認刪除訂單', '刪除後將無法恢復，確定要刪除嗎？', executeDelete); }
-    function executeDelete() { hideModal(); if (!pendingDeleteId) return; callApi({ action: 'delete', orderId: pendingDeleteId }, (resp) => { if(resp.result === 'success') { showToast("訂單已刪除", 'success'); fetchHistory(); } else { showToast("刪除失敗: " + resp.msg, 'error'); } pendingDeleteId = null; }); }
+    function executeDelete() { hideModal(); if (!pendingDeleteId) return; const context = liff.getContext(); if (!context || !context.userId) { showToast("無法取得使用者資訊", 'error'); return; } callApi({ action: 'delete', orderId: pendingDeleteId, userId: context.userId }, (resp) => { if(resp.result === 'success') { showToast("訂單已刪除", 'success'); fetchHistory(); } else { showToast("刪除失敗: " + resp.msg, 'error'); } pendingDeleteId = null; }); }
 
     function submitOrder() {
       const cards = document.querySelectorAll('.card-item'); let lines = [];
